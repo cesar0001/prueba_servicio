@@ -1,0 +1,253 @@
+﻿@page "/pregunta-seguridad"
+
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+@using System.Text.Json;
+
+@if (claveCorrecta == false)
+{
+    <div class="container" style="background: white; max-width: 700px; ">
+
+        <div class="row">
+
+            <div class="col-12">
+                <br />
+                <div class="align_center">
+                    <h3 style="color: #2b3940">
+                        Recuperando Clave
+
+                    </h3>
+                    <p style="font-size: 15px;font-weight: bold;">Responde tu pregunta de seguridad para poder continuar.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <div class="container" style="background: white; max-width: 1000px; min-width:200px">
+
+        <div class="row">
+
+            @if (recuperando_data_modelo.idUsuario==0)
+            {
+                <div class="col-12" style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius: 4px; margin: 10px 10px 10px 10px; padding: 15px; ">
+                   
+                    <div class="align_center">
+                        <p style="color: #2b3940;font-size: 15px; font-weight: bold;">Este correo no ha escrito su pregunta de seguridad.</p>
+
+                    </div>
+                 </div>
+            }
+            else
+            {
+
+                <div class="col-12" style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); border-radius: 4px; margin: 10px 10px 10px 10px; padding: 15px; ">
+                    <br />
+                    <EditForm Model="recuperando_data_modelo" OnValidSubmit="validar" class="form_type_1 type_2">
+                        <DataAnnotationsValidator />
+
+                        <div class="row">
+                            <div class="col-md-4" style="margin-bottom:10px">
+                                <label style="font-size: 15px; font-weight: bold; color: #2b3940 ">Pregunta</label>
+                            </div>
+                            <div class="col-md-8" style="margin-bottom:20px">
+                                <InputText disabled="true" style="color: #000000; background-color: #E8ECEF;" class="cambio_color" id="id_resp" placeholder="Pregunta
+" @bind-Value="@recuperando_data_modelo.miPregunta" />
+                                <ValidationMessage For="@(() => recuperando_data_modelo.miPregunta)" />
+                            </div>
+
+
+                            <div class="col-lg-12" style="margin-bottom:-20px"><br></div>
+                            @*esta es de las respuesta*@
+                            <div class="col-md-4" style="margin-bottom:10px">
+                                <label style="font-size: 15px; font-weight: bold; color: #2b3940 ">Respuesta</label>
+                            </div>
+
+                            <div class="col-md-8" style="margin-bottom:10px">
+                                @*<InputText style="color: #000000;" type="password" class="cambio_color" id="id_resp" placeholder="Respuesta" @bind-Value="@recuperando_data_modelo.respuesta" />*@
+
+                                <div class="container_interno" style=" max-width: 700px; width: 100%;">
+                                    <div class="wrapp-input" style="position: relative; width: 100%; min-height: 50px;">
+                                        <span class="icon-aye" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" @onclick="TogglePasswordVisibility">
+                                            <i style="color:black" class="@PasswordIcon"></i>
+                                        </span>
+
+                                        <InputText @bind-Value="@recuperando_data_modelo.respuesta"
+                                                   style="color: #000000; background: transparent; text-align: left; width: 100%; border: 1px solid #4e4e4e; line-height: inherit; height: 40px; padding: 10px 15px; -webkit-transition: all .3s ease; -o-transition: all .3s ease; transition: all .3s ease;"
+                                                   type="@isPassword"
+                                                   id="id_resp"
+                                                   class="id_resp"
+                                                   placeholder="Respuesta" />
+
+                                    </div>
+
+
+                                </div>
+                                <ValidationMessage For="@(() => recuperando_data_modelo.respuesta)" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <br />
+                                <div class="align_center">
+                                    <button type="submit" class="button type1" style="width:100%">
+                                        <span><span style="color:white">Recuperar</span><span>Recuperar</span></span>
+                                    </button>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <br />
+
+                    </EditForm>
+
+
+
+
+                </div>
+            }
+
+        </div>
+    </div>
+}
+else
+{
+    <EscribirNuevoPassword idUsuario="@recuperando_data_modelo.idUsuario"></EscribirNuevoPassword>
+}
+
+
+
+
+
+
+
+
+
+@if (AbrirModal == true)
+{
+    <MensajeModal Estilo="@estilo" Titulo="@titulo" Cuerpo="@mensaje" cerrarVentana="@(() => cerrarModal())"></MensajeModal>
+}
+
+
+
+
+@code {
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string correo { get; set; }
+
+    recuperando_claveDto recuperando_data_modelo = new recuperando_claveDto();
+
+    private bool AbrirModal = false, preloader = false, claveCorrecta = false,existePregunta=false;
+    private string titulo = "Recuperando Clave", mensaje = "La Respuesta que ingreso no coinciden.", estilo = "";
+
+    private void cerrarModal()
+    {
+        AbrirModal = !AbrirModal;
+        estilo = AbrirModal == true ? "display: none;" : "";
+    }
+
+
+    private bool IsPasswordVisible { get; set; } = false;
+    private string PasswordIcon => IsPasswordVisible ? "fa fa-eye-slash" : "fa fa-eye";
+    private string isPassword => IsPasswordVisible ? "text" : "password";
+
+
+    private void TogglePasswordVisibility()
+    {
+        IsPasswordVisible = !IsPasswordVisible;
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            existeCorreoDto model = new existeCorreoDto();
+            model.Email = correo;
+            var response = await Http.PostAsJsonAsync("api/Usuarios/existe/correo", model);
+            if (response.IsSuccessStatusCode)
+            {
+
+
+                Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+
+                if (respuesta.res == "true")
+                {
+                    await tenerPreguntaCorreo();
+
+
+                }
+                else
+                {
+                    navigationManager.NavigateTo("/");
+                }
+
+
+            }
+            else
+            {
+
+            }
+
+            //fin de renderizado
+        }
+
+    }
+
+    async Task validar()
+    {
+        Console.WriteLine(recuperando_data_modelo.idUsuario);
+        if (recuperando_data_modelo.respuesta == recuperando_data_modelo.miRespuesta)
+        {
+            claveCorrecta = true;
+        }
+        else
+        {
+            AbrirModal = true;
+        }
+    }
+
+    async Task tenerPreguntaCorreo()
+    {
+        existeCorreoDto model = new existeCorreoDto();
+        model.Email = correo;
+        var response = await Http.PostAsJsonAsync("api/Usuarios/tener/pregunta/correo", model);
+        if (response.IsSuccessStatusCode)
+        {
+
+
+            Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+            if (respuesta.res == "true")
+            {
+
+                if(respuesta.modelo==null)
+                {
+                    existePregunta = true;
+                }
+                else
+                {
+                    existePregunta = false;
+                }
+                Console.WriteLine(respuesta.modelo.miPregunta);
+                Console.WriteLine("ajjasa");
+                recuperando_data_modelo = respuesta.modelo;
+
+                StateHasChanged();
+            }
+
+        }
+        else
+        {
+
+        }
+    }
+
+}

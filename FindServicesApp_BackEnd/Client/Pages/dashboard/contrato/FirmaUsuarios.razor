@@ -1,0 +1,144 @@
+﻿@using System.Text.Json;
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+
+@using System.IO
+
+<div class="container" style="background: white; max-width: 700px; ">
+    @*<h2>Contact Us</h2>*@
+    <div class="row">
+
+
+
+        <div class="col-sm-12">
+            <br />
+
+            
+ 
+            <form @onsubmit="OnSubmit">
+                <div class="file-input-container">
+                    <InputFile OnChange="OnInputFileChange" />
+                </div>
+
+                <p>
+                    La foto debe de pesar menos de 8 MB
+                </p>
+                @if (imagenRequerida != null)
+                {
+                    <p style="color:red">@imagenRequerida</p>
+                }
+
+                <div class="align_center" style="padding-top:10px">
+                   
+                        <button type="submit" class="button type1">
+                            <span><span>Registrar</span><span>Registrar</span></span>
+                        </button>
+                    
+
+                </div>
+
+                <br />
+            
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter] public UsuarioGeneralDto usuario { get; set; }
+
+    FirmaCreateOrEditDto firma = new FirmaCreateOrEditDto();
+
+
+    private string imagenRequerida = null;
+
+    IReadOnlyList<IBrowserFile> selectedFiles;
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFiles = e.GetMultipleFiles();
+        this.StateHasChanged();
+    }
+
+    private async Task OnSubmit()
+    {
+
+        try
+        {
+            imagenRequerida = null;
+            foreach (var file in selectedFiles)
+            {
+
+                if (file.Size > 0 && file.Size < 8000000)
+                {
+
+                    Stream stream = file.OpenReadStream(maxAllowedSize: 8000000);
+                    MemoryStream ms = new MemoryStream();
+                    await stream.CopyToAsync(ms);
+                    stream.Close();
+
+                    firma.FileName = file.Name;
+                    firma.FileContent = ms.ToArray();
+                    ms.Close();
+
+                    var response = await Http.PostAsJsonAsync("api/usuarios/crearFirma", firma);
+
+                    if (response.IsSuccessStatusCode) {
+
+                        Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+                        if (respuesta.res == "true")
+                        {
+                            navigationManager.NavigateTo("/",true);
+                        }
+
+                    }
+                    else
+                    {
+                        if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+                        {
+                            navigationManager.NavigateTo("/",true);
+
+                        }
+                    }
+
+                    selectedFiles = null;
+                }
+                else
+                {
+
+                    imagenRequerida = $"* El Tamaño de la Imagen es mayor a 8MB";
+                }
+
+
+
+                //        await Http.PostAsJsonAsync<UploadedFile>
+                //("api/usuarios/crearFirma", uploadedFile);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            imagenRequerida = "* El Campo Firma es Obligatorio.";
+        }
+
+
+
+
+        this.StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        firma.idUsuario = usuario.Id;
+    }
+
+
+
+}
+
+
+

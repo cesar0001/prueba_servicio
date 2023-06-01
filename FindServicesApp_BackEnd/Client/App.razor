@@ -1,0 +1,53 @@
+﻿<!--<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">-->
+            @*<p role="alert">Sorry, there's nothing at this address.</p>*@
+
+            <!--<Page404></Page404>
+        </LayoutView>
+    </NotFound>
+</Router>-->
+
+
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <NotAuthorized>
+                <div class="page_404">
+                    <div class="container">
+
+                        <div class="section_404">
+                            <h1></h1>
+                            <div class="section_404_inner">
+                                <h2 class="main_title">Usted no esta Autorizado :(</h2>
+                                <p style="font-size: 15px;font-weight: bold;">Usted no esta Autorizado para ver el contenido de esta direccion.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                @*<h1>Lo siento</h1>
+                <p>No está autorizado para acceder a esta página.</p>
+                <p>Es posible que deba iniciar sesión como un usuario diferente.</p>*@
+            </NotAuthorized>
+            <Authorizing>
+                <h1>Autenticación en progreso</h1>
+                <p style="font-size: 15px;font-weight: bold;">Solo visible mientras la autenticación está en curso.</p>
+            </Authorizing>
+        </AuthorizeRouteView>
+    </Found>
+    <NotFound>
+        <CascadingAuthenticationState>
+            <LayoutView Layout="@typeof(MainLayout)">
+                @*<h1>Sorry</h1>
+        <p>Sorry, there's nothing at this address.</p>*@
+                <Page404></Page404>
+            </LayoutView>
+        </CascadingAuthenticationState>
+    </NotFound>
+</Router>

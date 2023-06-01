@@ -1,0 +1,68 @@
+﻿@*style="display: none;"*@
+<div class="popup_holder subscribe14" style="@Estilo">
+    <div class="popup" style="max-width:400px;border-radius: 4px; padding: 10px; margin-top: 14px; margin-bottom:14px">
+
+        <div class="align_center" style="padding-top:10px">
+            <!--!-->
+            <h2>
+                @*Refer*@ <span>@Titulo</span>
+            </h2>
+            <!--!-->
+        </div>
+
+
+
+        <div class="container" style="background: white; max-width: 100%; padding-left: 0px; padding-right: 0px ">
+
+            <div class="row">
+
+
+
+                <div class="col-sm-12">
+                    <br />
+                    <div class="align_center">
+                        <span style="font-weight: bold; font-size: 17px;">
+                            Confirmar Que desea Eliminar  <p style="color:red;display:initial">@Mensaje</p>
+                        </span>
+
+                    </div>
+
+                </div>
+
+                 
+                <div class="col-sm-12">
+
+                    <div class="align_center">
+
+                        <button @onclick="confirmarEliminacion" type="submit" class="button type1" style="width: 100%; margin-top:10px">
+                            <span><span style="color:white">Eliminar</span><span>Eliminar</span></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+        <a id="closePopup" @onclick="cerrarVentana"></a>
+    </div>
+</div>
+
+
+@code {
+    [Parameter] public string Titulo { get; set; }
+    [Parameter] public string Estilo { get; set; }
+    [Parameter] public string Mensaje { get; set; }
+
+    [Parameter] public EventCallback cerrarVentana { get; set; }
+    [Parameter] public EventCallback<bool> confirmacion { get; set; }
+
+    private async Task confirmarEliminacion()
+    {
+        await confirmacion.InvokeAsync(true);
+    }
+
+}

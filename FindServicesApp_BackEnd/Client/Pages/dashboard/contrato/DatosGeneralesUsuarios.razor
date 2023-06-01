@@ -1,0 +1,956 @@
+﻿@using System.Text.Json;
+
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+@using System.Text.RegularExpressions
+
+@using System.Text;
+
+
+<div class="container" style="background: white; max-width: 100%; width: 100%; ">
+    @*<h2>Contact Us</h2>*@
+    <div class="row">
+
+
+
+        <div class="col-sm-12">
+            <br />
+
+            <EditForm Model="datos" OnValidSubmit="@MetodoInsertarData" class="form_type_1 type_2">
+                <DataAnnotationsValidator />
+
+                <div class="row">
+                    <div class="col-md-6 col-ms-6">
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Nombre</label>
+                            <InputText style="color: #000000" class="cambio_color" placeholder="Ingresa tu Nombre" name="textinput" @bind-Value="@datos.Nombre" />
+                            <ValidationMessage For="@(() => datos.Nombre)" />
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Apellido</label>
+                            <InputText style="color: #000000" Class="form-control cambio_color" placeholder="Ingresa tu Apellido " @bind-Value="@datos.Apellido" />
+                            <ValidationMessage For="@(() => datos.Apellido)" />
+                        </div>
+
+
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Identidad </label>
+                            <InputText style="color: #000000" Class="form-control cambio_color" placeholder="Ingresa tu Identidad " @bind-Value="@datos.Identidad" />
+                            <ValidationMessage For="@(() => datos.Identidad)" />
+                        </div>
+
+                        <div class="control-group" style="margin-top:15px">
+                            <label class="control-label cambio_color">Departamentos</label>
+                            <div class="custom_select">
+                                <InputSelectNumber ValueChanged="@((int value) => ValorPaisCambiado(value))"
+                                                   ValueExpression="@(() => datos.DepartamentoId)"
+                                                   Value="datos.DepartamentoId"
+                                                   style="@estilosDepto">
+                                    <option value="0">Seleccione un Departamento</option>
+                                    @foreach (var item in Departamentos)
+                                    {
+
+                                        @if (item.Id == datos.DepartamentoId)
+                                        {
+                                            <option selected value="@item.Id">@item.Nombre</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Id">@item.Nombre</option>
+                                        }
+                                    }
+                                </InputSelectNumber>
+                                @if (estaSeleccionadoDepto == true)
+                                {
+                                    <div class="validation-message">* El Campo Departamentos es Obligatorio.</div>
+
+                                }
+                                @*<ValidationMessage For="@(() => datos.Genero)" />*@
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Municipios</label>
+                            <div class="custom_select">
+
+                                <InputSelectNumber ValueChanged="@((int value) => aa(value))"
+                                                   ValueExpression="@(() => datos.MunicipioId)"
+                                                   Value="datos.MunicipioId"
+                                                   style="@estilosMunicipio">
+                                    <option value="0">Seleccione un Municipio</option>
+                                    @foreach (var item in Municipio)
+                                    {
+
+                                        @if (item.Id == datos.MunicipioId)
+                                        {
+                                            <option selected value="@item.Id">@item.Nombre</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Id">@item.Nombre</option>
+                                        }
+                                    }
+                                </InputSelectNumber>
+                                @*<InputSelect @onchange="OnOptionSelected"
+                             @bind-Value="datos.MunicipioId"
+
+                             style="@estilosMunicipio">
+                    <option value="0" selected>Seleccione un Municipio</option>
+                    @foreach (var item in Municipio)
+                    {
+
+                        <option value="@item.Id">@item.Nombre</option>
+                    }
+                </InputSelect>*@
+                                @*<ValidationMessage For="@(() => datos.MunicipioId)" />*@
+                                @if (estaSeleccionadoMunicipio == true)
+                                {
+                                    <div class="validation-message">* El Campo Municipios es Obligatorio. </div>
+
+                                }
+                            </div>
+                        </div>
+
+
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Celular <p class="parrafo_chiquito">Ejemplo: 95314543</p> </label>
+                            <InputText style="color: #000000" class="cambio_color" placeholder="Ingresa tu Celular" name="textinput" @bind-Value="@datos.Celular" />
+                            <ValidationMessage For="@(() => datos.Celular)" />
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Teléfono  <p class="parrafo_chiquito">Puede dejarlo vacío</p> </label>
+                            <InputText style="color: #000000" class="cambio_color" placeholder="Ingresa tu Telefono" name="textinput" @bind-Value="@datos.Telefono" />
+                            @*<ValidationMessage For="@(() => datos.Telefono)" />*@
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-6 col-ms-6">
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Fecha de Nacimiento </label>
+                            <InputDate style="@estilosFecha"
+                                       Class="form-control cambio_color"
+                                       @bind-Value="@datos.Fecha_nacimiento" />
+                            @*<ValidationMessage For="@(() => datos.Fecha_nacimiento)" />*@
+                            @if (mayorA18 == false)
+                            {
+                                @((MarkupString)ErrorFecha)
+
+
+                            }
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Acerca de (Opcional) </label>
+                            @*@oninput="@(e => ValidarTexto(e))"*@
+                            <InputTextArea rows="4"
+                                           cols="50"
+                                           style="@estilosacercaDe"
+                                           Class="form-control cambio_color"
+                                           placeholder="Cuentanos acerca de ti "
+                                           @bind-Value="@datos.Opinion_Personal"></InputTextArea>
+
+                            @if (errorEnAcerca == true)
+                            {
+                                @((MarkupString)ErrorAcerca)
+
+
+                            }
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Profesion</label>
+                            @*<InputText style="color: #000000" Class="form-control cambio_color" placeholder="Ingresa tu Profesion " @bind-Value="@datos.Profesion" />*@
+                            @*<ValidationMessage For="@(() => datos.Profesion)" />*@
+                            @*<InputSelect @bind-Value="@datos.id_profesion"
+                         class="form-control select2"
+                         style="width: 100%"
+                         aria-hidden="true">
+                <option value="" selected>Seleccione la Profesion</option>
+                @foreach (var item in Profesion)
+                {
+
+                    @if (item.Id == datos.id_profesion)
+                    {
+                        <option selected value="@item.Id">@item.NombreProfesion</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Id">@item.NombreProfesion</option>
+                    }
+                }
+            </InputSelect>*@
+                            @*<ValidationMessage For="@(() => datos.id_profesion)" />*@
+                            @*<InputSelectNumber ValueChanged="@((int value) => selecionProfesion(value))"
+                               ValueExpression="@(() => profesionId)"
+                               Value="profesionId"
+                               class="@quitarSelect2"
+                               style="z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; "
+                               aria-hidden="true">
+                <option value="0">Seleccione una Profesion</option>
+                @foreach (var item in Profesion)
+                {
+
+                    @if (item.Id == profesionId)
+                    {
+                        <option selected value="@item.Id">@item.NombreProfesion</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Id">@item.NombreProfesion</option>
+                    }
+                }
+            </InputSelectNumber>*@
+
+                            <InputText placeholder="Seleccione la Profesión"
+                                       type="text"
+                                       list="opciones"
+                                       @onblur="ProfValidacion"
+                                       style="z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; "
+                                       @bind-Value="@ValorSeleccionado" />
+
+                            <datalist style="display: none;" id="opciones">
+                                @foreach (var item in Profesion)
+                                {
+                                    <option value="@item.NombreProfesion"></option>
+
+                                }
+
+                            </datalist>
+
+                            @if (campoProfesional == false)
+                            {
+                                @((MarkupString)ErrorProfesional)
+
+
+                            }
+
+
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Genero</label>
+                            <div class="custom_select">
+                                <InputSelect @bind-Value="@datos.Genero" class="cambio_color custom_select select_title" style="width: 100%; height: 40px; color: #000000 ">
+                                    <option value="" selected>Seleccione de Genero</option>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Femenino">Femenino</option>
+                                    <option value="Ambos Generos">Ambos Generos</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => datos.Genero)" />
+                            </div>
+                        </div>
+
+
+                       
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Facebook <p class="parrafo_chiquito">Puede dejarlo vacío</p> </label>
+                            <InputText style="color: #000000" class="cambio_color" placeholder="Ingresa tu Celular" name="textinput" @bind-Value="@datos.Facebook" />
+                            <ValidationMessage For="@(() => datos.Facebook)" />
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Instagram <p class="parrafo_chiquito">Puede dejarlo vacío</p> </label>
+                            <InputText style="color: #000000" class="cambio_color" placeholder="Ingresa tu Celular" name="textinput" @bind-Value="@datos.Instagram" />
+                            <ValidationMessage For="@(() => datos.Instagram)" />
+                        </div>
+
+
+
+                    </div>
+
+                    @*<div class="col-12 col-md-12 col-ms-12">
+            <div class="control-group">
+                <label class="control-label cambio_color">Foto Tipos Permitidos: PNG,JPG, JPEG.</label>
+                <div class="file-input-container" style="border: none;">
+                    <InputFile accept="image/png,image/jpeg,image/jpg,image/tiff" OnChange="OnInputFileChange" />
+                </div>
+                <p class="cambio_color">
+                    La foto debe de pesar menos de 8 MB
+                </p>
+                @if (imagenRequerida != null)
+                {
+                    <p style="color:red">@imagenRequerida</p>
+                }
+            </div>
+        </div>*@
+
+                     
+                  
+
+         
+                    <div class="col-12 col-md-12 col-ms-12">
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Direccion </label>
+
+                            <InputTextArea rows="4"
+                                           cols="50"
+                                           style="color: #000000; z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; width: 100%; height: 116px; color: #000000; outline: none !important; "
+                                           Class="form-control cambio_color"
+                                           placeholder="Direccion"
+                                           @bind-Value="@datos.Direccion"></InputTextArea>
+                            <ValidationMessage For="@(() => datos.Direccion)" />
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+                <div class="align_center" style="padding-top:10px">
+                    @*@if (btnNombre == "Registrar")
+                        {
+
+                        }*@
+                    <button type="submit" class="button type1" @onclick="eventoEstilos" >
+                        <span><span style="color:white">Siguiente</span><span>Siguiente</span></span>
+                    </button>
+
+                </div>
+
+                <br />
+
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@if (AbrirModal == true)
+{
+    <MensajeModal Estilo="@estilo" Titulo="@titulo" Cuerpo="@mensaje" cerrarVentana="@(() => cerrarModal())"></MensajeModal>
+}
+
+@code {
+
+
+    [Parameter] public string data { get; set; }
+    [Parameter] public EventCallback<DatosGeneralesDto> MetodoGuardar { get; set; }
+
+    [Parameter] public List<Departamentos> Departamentos { get; set; } = new List<Departamentos>();
+    [Parameter] public List<Municipio> Municipio { get; set; } = new List<Municipio>();
+    [Parameter] public List<Profesion> Profesion { get; set; } = new List<Profesion>();
+
+
+    [Parameter] public EventCallback<int> CambiarDepartamentos { get; set; }
+
+    DatosGeneralesDto datos = new DatosGeneralesDto();
+
+    private int deptoId = 0;
+    private bool estaSeleccionadoDepto = false,
+        estaSeleccionadoMunicipio = false,
+        errorEnAcerca = false,
+        mayorA18 = true,
+        campoProfesional = true;
+    string estilosMunicipio = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ";
+    string estilosDepto = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ";
+    string estilosacercaDe = "color: #000000; z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; width: 100%; height: 116px; color: #000000; outline: none !important; ";
+    string estilosFecha = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ";
+    string edadTotal = "0";
+
+    private int profesionId = 0;
+
+    private bool AbrirModal = false;
+    private string titulo = "Campos Obligatorios", mensaje = "El Campo de Profesional es Obligatorio.", estilo = "";
+
+    private string quitarSelect2 = "form-control select2";
+
+    IJSObjectReference module;
+    private string ValorSeleccionado { get; set; } = "";
+
+    Regex emailRegex = new Regex(@"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b");
+    Regex numberRegex = new Regex(@"\d");
+    Regex symbolRegex = new Regex(@"[@]");
+
+
+    private void cerrarModal()
+    {
+        AbrirModal = !AbrirModal;
+        estilo = AbrirModal == true ? "display: none;" : "";
+    }
+
+    private async Task ValorPaisCambiado(int value)
+    {
+        deptoId = value;
+        datos.DepartamentoId = value;
+
+        if (deptoId == 0)
+        {
+            estaSeleccionadoDepto = true;
+            //estilosDepto = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: 1px solid red !important; ";
+
+            estaSeleccionadoMunicipio = false;
+            //estilosMunicipio = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ";
+        }
+        else
+        {
+            estaSeleccionadoDepto = false;
+            //estilosDepto = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ";
+
+            //estilosMunicipio = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: 1px solid red !important; ";
+            estaSeleccionadoMunicipio = true;
+        }
+
+        await CambiarDepartamentos.InvokeAsync(value);
+
+
+    }
+
+    private async Task aa(int value)
+    {
+        datos.MunicipioId = value;
+
+        if (datos.MunicipioId == 0)
+        {
+            //estilosMunicipio = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: 1px solid red !important; ";
+            estaSeleccionadoMunicipio = true;
+        }
+        else
+        {
+            estaSeleccionadoMunicipio = false;
+            //estilosMunicipio = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ";
+
+        }
+
+
+    }
+
+    private async Task selecionProfesion(int value)
+    {
+
+        datos.id_profesion = value;
+        profesionId = value;
+
+    }
+
+    public string QuitarTildes(string texto)
+    {
+        var chars = new Dictionary<char, char>
+        {
+                {'á', 'a'},
+                {'é', 'e'},
+                {'í', 'i'},
+                {'ó', 'o'},
+                {'ú', 'u'},
+                {'Á', 'A'},
+                {'É', 'E'},
+                {'Í', 'I'},
+                {'Ó', 'O'},
+                {'Ú', 'U'},
+                {'ñ', 'n'},
+                {'Ñ', 'N'}
+            };
+
+        var sb = new StringBuilder();
+
+        foreach (char c in texto)
+        {
+            if (chars.TryGetValue(c, out char newChar))
+            {
+                sb.Append(newChar);
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private async Task verificarSeleccion()
+    {
+
+
+        bool seleccionValida = false;
+
+        // Verificar si el valor seleccionado está en la lista
+        foreach (var opcion in Profesion)
+        {
+            //convertir a minuscula
+            if (QuitarTildes(opcion.NombreProfesion.Replace(" ", "").ToLower()) == QuitarTildes(ValorSeleccionado.Replace(" ", "").ToLower()) )
+            {
+                seleccionValida = true;
+                break;
+            }
+        }
+
+        if (seleccionValida)
+        {
+            // El valor seleccionado está en la lista
+            //Console.WriteLine("Selección válida: " + ValorSeleccionado);
+            await TenerIdProfesion(ValorSeleccionado);
+            campoProfesional = true;
+        }
+        else
+        {
+            // El valor seleccionado no está en la lista
+            //Console.WriteLine("Selección inválida: " + ValorSeleccionado);
+            campoProfesional = false;
+            ErrorProfesional = "<div class=\"validation-message\">* La Profesión  escrita no Existe.</div>";
+        }
+    }
+
+
+    private async Task eventoEstilos()
+    {
+
+        await Geolocalizacion();
+
+
+        if (ValorSeleccionado.Trim().Length == 0)
+        {
+            ErrorProfesional = "<div class=\"validation-message\">* El Campo Profesional es Obligatorio</div>";
+            campoProfesional = false;
+        }
+        else
+        {
+            await verificarSeleccion();
+
+        }
+
+
+        if (deptoId == 0)
+        {
+            estaSeleccionadoDepto = true;
+            //estilosDepto = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: 1px solid red !important; ";
+        }
+        else
+        {
+            estaSeleccionadoDepto = false;
+            //estilosDepto = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ";
+
+        }
+
+        if (datos.MunicipioId == 0)
+        {
+            //estilosMunicipio = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: 1px solid red !important; ";
+            estaSeleccionadoMunicipio = true;
+        }
+        else
+        {
+            estaSeleccionadoMunicipio = false;
+            //estilosMunicipio = "z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ";
+
+        }
+
+
+        if (emailRegex.IsMatch(datos.Opinion_Personal) || numberRegex.IsMatch(datos.Opinion_Personal) || symbolRegex.IsMatch(datos.Opinion_Personal))
+        {
+            //cae aqui es por que tiene @ o numeros
+            errorEnAcerca = true;
+        }
+        else
+        {
+            errorEnAcerca = false;
+
+        }
+
+        mayorA18 = esMayorDeEdad() >= 18 ? true : false;
+
+
+
+
+    }
+
+
+    private async Task ProfValidacion(FocusEventArgs eventArgs)
+    {
+        // Acciones que se ejecutarán cuando el elemento pierda el foco
+        // Puedes acceder al valor del elemento con eventArgs.Value
+        await verificarSeleccion();
+        if (campoProfesional == false)
+        {
+            ValorSeleccionado = "";
+            titulo = "Error en la Profesión";
+            mensaje = "<div class=\"validation-message\">* La Profesión  escrita no existe. Asegurese que la este en el listado</div>";
+            datos.id_profesion = 0;
+            AbrirModal = true;
+
+        }
+
+       
+
+        // Realiza alguna acción o validación con el valor
+        // ...
+    }
+
+    IReadOnlyList<IBrowserFile> selectedFiles;
+    private string imagenRequerida = null;
+    ImagenLocal imagenSeleccionada = new ImagenLocal();
+
+
+
+    private string ErrorGeo = "<div class=\"validation-message\">\r\n                                <span>* Para tener las Coordenadas Debe de Aceptar los Permisos</span>\r\n                                <br />\r\n                                <span>\r\n                                    * En Caso de haber denegado tiene que ir a la parte de arriba del buscador\r\n                                    y buscar este simbolo <img src=\"images/sinLocalizacion.png\" alt=\"Icono Geolocalizacion\" /> <span> Luego dar en Aceptar Permisos.</span>\r\n                                </span>\r\n                                <br />\r\n                                <span>* En caso de que no aparezca la ventana dar Click en el Boton Tener Geolocalizacion y aparecera una ventana en la parte de arriba. Debe de aceptar los permisos.</span>\r\n                                <br />\r\n                            </div>";
+    private string ErrorAcerca = "<div class=\"validation-message\">* El Campo Acerca de tiene un Numeros o @.</div>";
+    private string ErrorFecha = $"<div class=\"validation-message\">* Tienes que ser mayor a 18 años.</div>";
+    private string ErrorProfesional = "<div class=\"validation-message\">* El Campo Profesional es Obligatorio.</div>";
+
+
+    string latitude = null;
+    string longitude = null;
+
+
+    public class GeolocationPosition
+    {
+        public GeolocationCoordinates? coords { get; set; }
+    }
+
+    public class GeolocationCoordinates
+    {
+        public string? latitude { get; set; }
+        public string? longitude { get; set; }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+
+        try
+        {
+
+            var response_data = await Http.GetAsync($"api/usuarios/tenerUsuario/{data}");
+            response_data.EnsureSuccessStatusCode();
+            UsuarioGeneralDto usuario;
+            usuario = await response_data.Content.ReadFromJsonAsync<UsuarioGeneralDto>();
+
+            datos.RegistroUsuarioId = usuario.Id;
+
+            if (usuario.DatosGenerales!=null)
+            {
+                datos.Nombre = usuario.DatosGenerales.Nombre;
+                datos.Apellido = usuario.DatosGenerales.Apellido;
+                datos.Profesion = usuario.DatosGenerales.Profesion;
+                datos.Identidad = usuario.DatosGenerales.Identidad;
+                datos.Genero = usuario.DatosGenerales.Genero;
+                datos.Opinion_Personal = usuario.DatosGenerales.Opinion_Personal;
+                datos.Fecha_nacimiento = usuario.DatosGenerales.Fecha_nacimiento;
+                datos.DepartamentoId = usuario.DatosGenerales.DepartamentoId;
+                datos.MunicipioId = usuario.DatosGenerales.MunicipioId;
+                datos.id_profesion = usuario.DatosGenerales.id_profesion;
+                datos.Celular = usuario.DatosGenerales.Celular;
+                datos.Telefono = usuario.DatosGenerales.Telefono;
+                datos.Direccion = usuario.DatosGenerales.Direccion;
+                datos.Facebook = usuario.DatosGenerales.Facebook;
+                datos.Instagram = usuario.DatosGenerales.Instagram;
+
+                await ValorDeptoCambiado(datos.DepartamentoId);
+
+                datos.Opinion_Personal = datos.Opinion_Personal ?? "";
+                deptoId = datos.DepartamentoId;
+
+                ValorSeleccionado = datos.Profesion.NombreProfesion;
+                await TenerIdProfesion(ValorSeleccionado);
+            }
+            else
+            {
+                datos.Fecha_nacimiento = DateTime.Now;
+                datos.Opinion_Personal = datos.Opinion_Personal ?? "";
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+
+            navigationManager.NavigateTo("logout");
+
+        }
+
+
+
+
+        await Geolocalizacion();
+
+
+
+    }
+
+
+    async Task Geolocalizacion()
+    {
+
+
+        GeolocationPosition GeolocationPosition = new GeolocationPosition();
+        //IJSObjectReference module;
+
+
+        try
+        {
+            //module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+
+            GeolocationPosition = await module.InvokeAsync<GeolocationPosition>("tenerGeolocation");
+            latitude = GeolocationPosition.coords.latitude;
+            longitude = GeolocationPosition.coords.longitude;
+            datos.latitud = latitude.ToString();
+            datos.longitud = longitude.ToString();
+            Console.WriteLine($"Fin del asunto: {GeolocationPosition.coords.latitude}");
+            Console.WriteLine($"Fin del asunto: {GeolocationPosition.coords.longitude}");
+
+            //validacion
+
+
+
+            //fin de validacion
+            ErrorGeo = null;
+            AbrirModal = false;
+            //StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            AbrirModal = true;
+            ErrorGeo = "<div class=\"validation-message\">\r\n                                <span>* Para tener las Coordenadas Debe de Aceptar los Permisos</span>\r\n                                <br />\r\n                                <span>\r\n                                    * En Caso de haber denegado tiene que ir a la parte de arriba del buscador\r\n                                    y buscar este simbolo <img src=\"images/sinLocalizacion.png\" alt=\"Icono Geolocalizacion\" /> <span> Luego dar en Aceptar Permisos.</span>\r\n                                </span>\r\n                                <br />\r\n                                <span>* En caso de que no aparezca la ventana dar Click en el Boton Tener Geolocalizacion y aparecera una ventana en la parte de arriba. Debe de aceptar los permisos.</span>\r\n                                <br />\r\n                            </div>";
+            mensaje = ErrorGeo;
+            titulo = "Activacion de Geolocalizacion.";
+            StateHasChanged();
+            //Console.WriteLine("Asegurese de tener los permisos");
+        }
+
+    }
+
+    //private void OnInputFileChange(InputFileChangeEventArgs e)
+    //{
+    //    selectedFiles = e.GetMultipleFiles();
+    //    imagen();
+
+    //    this.StateHasChanged();
+    //}
+
+    //private async Task imagen()
+    //{
+    //    try
+    //    {
+    //        imagenRequerida = null;
+    //        foreach (var file in selectedFiles)
+    //        {
+
+    //            if (file.Size > 0 && file.Size < 8000000)
+    //            {
+
+    //                Stream stream = file.OpenReadStream(maxAllowedSize: 8000000);
+    //                MemoryStream ms = new MemoryStream();
+    //                await stream.CopyToAsync(ms);
+    //                stream.Close();
+
+    //                imagenSeleccionada.FileName = file.Name;
+    //                imagenSeleccionada.FileContent = ms.ToArray();
+    //                imagenSeleccionada.tamaño = file.Size;
+    //                ms.Close();
+
+    //                datos.Imagen = imagenSeleccionada;
+
+    //                selectedFiles = null;
+    //            }
+    //            else
+    //            {
+
+    //                imagenRequerida = $"* El Tamaño de la Imagen es mayor a 8MB";
+    //            }
+
+    //        }
+
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        //imagenRequerida = "* El Campo Firma es Obligatorio.";
+    //    }
+
+
+    //}
+
+
+
+
+    private async Task TenerIdProfesion(string nombreProfesion)
+    {
+
+        try
+        {
+
+            var response = await Http.GetAsync($"api/Profesiones/idProfesional/{nombreProfesion}");
+            response.EnsureSuccessStatusCode();
+
+            Respuesta respuesta = await response.Content.ReadFromJsonAsync<Respuesta>();
+            if(respuesta.res=="true")
+            {
+                //Console.WriteLine(respuesta.modelo_pro.Id);
+                datos.id_profesion = respuesta.modelo_pro.Id;
+
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            navigationManager.NavigateTo("logout");
+        }
+    }
+
+
+    //este es el boton para insertar en el formulario
+    private async Task MetodoInsertarData()
+    {
+
+        //await Geolocalizacion();
+        GeolocationPosition GeolocationPosition = new GeolocationPosition();
+        try
+        {
+
+
+            GeolocationPosition = await module.InvokeAsync<GeolocationPosition>("tenerGeolocation");
+            latitude = GeolocationPosition.coords.latitude;
+            longitude = GeolocationPosition.coords.longitude;
+            datos.latitud = latitude.ToString();
+            datos.longitud = longitude.ToString();
+            Console.WriteLine($"Fin del asunto: {GeolocationPosition.coords.latitude}");
+            Console.WriteLine($"Fin del asunto: {GeolocationPosition.coords.longitude}");
+
+            //validacion
+
+            await ValidacionNivelGeneralParaGuardar();
+
+            //fin de validacion
+            ErrorGeo = null;
+            AbrirModal = false;
+            //StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            AbrirModal = true;
+            ErrorGeo = "<div class=\"validation-message\">\r\n                                <span>* Para tener las Coordenadas Debe de Aceptar los Permisos</span>\r\n                                <br />\r\n                                <span>\r\n                                    * En Caso de haber denegado tiene que ir a la parte de arriba del buscador\r\n                                    y buscar este simbolo <img src=\"images/sinLocalizacion.png\" alt=\"Icono Geolocalizacion\" /> <span> Luego dar en Aceptar Permisos.</span>\r\n                                </span>\r\n                                <br />\r\n                                <span>* En caso de que no aparezca la ventana dar Click en el Boton Tener Geolocalizacion y aparecera una ventana en la parte de arriba. Debe de aceptar los permisos.</span>\r\n                                <br />\r\n                            </div>";
+            mensaje = ErrorGeo;
+            titulo = "Activacion de Geolocalizacion.";
+            StateHasChanged();
+            //Console.WriteLine("Asegurese de tener los permisos");
+        }
+
+
+
+    }
+
+    private int esMayorDeEdad()
+    {
+        //validacion de edad
+        DateTime fechaActual = DateTime.Now;
+        DateTime fecha2 = new DateTime(datos.Fecha_nacimiento.Year,
+            datos.Fecha_nacimiento.Month,
+            datos.Fecha_nacimiento.Day); // aquí reemplaza por tu fecha
+
+        int edad = fechaActual.Year - fecha2.Year;
+
+        if (fechaActual.Month < fecha2.Month || (fechaActual.Month == fecha2.Month && fechaActual.Day < fecha2.Day))
+        {
+            edad--;
+        }
+
+        return edad;
+    }
+
+
+    private async Task ValorDeptoCambiado(int value)
+    {
+        //Console.WriteLine(value);
+        await InvokeAsync(StateHasChanged);
+        if (value == 0)
+        {
+            Municipio.Clear();
+        }
+        else
+        {
+            await CargarMunicipio(value);
+        }
+    }
+
+    private async Task CargarMunicipio(int deptoId)
+    {
+        try
+        {
+
+            var response = await Http.GetAsync($"api/Deptos/municipios/{deptoId}");
+            response.EnsureSuccessStatusCode();
+
+            Municipio = await response.Content.ReadFromJsonAsync<List<Municipio>>();
+            //Municipio = await Http.GetFromJsonAsync<List<Municipio>>($"api/Deptos/municipios/{deptoId}");
+
+
+        }
+        catch (Exception ex)
+        {
+            navigationManager.NavigateTo("logout");
+        }
+    }
+
+    private async Task ValidacionNivelGeneralParaGuardar()
+    {
+        if (ValorSeleccionado.Trim().Length == 0)
+        {
+            ErrorProfesional = "<div class=\"validation-message\">* El Campo Profesional es Obligatorio</div>";
+            campoProfesional = false;
+        }
+        else
+        {
+            await verificarSeleccion();
+
+        }
+
+        bool existeCorreoOnumero = false;
+
+
+        if (emailRegex.IsMatch(datos.Opinion_Personal ?? "") || numberRegex.IsMatch(datos.Opinion_Personal ?? "") || symbolRegex.IsMatch(datos.Opinion_Personal ?? ""))
+        {
+            //en caso de que exista match
+            existeCorreoOnumero = true;
+            errorEnAcerca = true;
+        }
+        else
+        {
+            existeCorreoOnumero = false;
+            errorEnAcerca = false;
+
+        }
+
+        estaSeleccionadoDepto = deptoId == 0 ? true : false;
+        estaSeleccionadoMunicipio = datos.MunicipioId == 0 ? true : false;
+        mayorA18 = esMayorDeEdad() >= 18 ? true : false;
+
+        //bool cumpleCaracteristicasImagen = true;
+        //if (datos.Imagen.tamaño >= 0 && datos.Imagen.tamaño < 8000000)
+        //{
+        //    cumpleCaracteristicasImagen = true;
+        //}
+        //else
+        //{
+        //    cumpleCaracteristicasImagen = false;
+        //}
+
+
+        bool existeIdProfesional = datos.id_profesion == 0 ? false : true;
+
+
+        if (
+estaSeleccionadoDepto == false
+&& estaSeleccionadoMunicipio == false
+&& existeCorreoOnumero == false
+&& mayorA18 == true
+&& string.IsNullOrEmpty(datos.latitud) == false
+&& string.IsNullOrEmpty(datos.longitud) == false
+//&& cumpleCaracteristicasImagen == true
+&& existeIdProfesional == true
+ && campoProfesional == true
+)
+        {
+            await MetodoGuardar.InvokeAsync(datos);
+            Console.WriteLine("SE EJECUTO EL BTN");
+
+        }
+    }
+
+
+}

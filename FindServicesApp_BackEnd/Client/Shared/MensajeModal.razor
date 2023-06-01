@@ -1,0 +1,54 @@
+﻿@*style="display: none;"*@
+<div class="popup_holder subscribe14" style="@Estilo">
+    <div class="popup" style="
+    border-radius: 4px;
+">
+
+        <div class="align_center" style="padding-top:10px">
+            <!--!-->
+            <h2>
+                @*Refer*@ <span>@Titulo</span>
+            </h2>
+            <!--!-->
+        </div>
+
+         
+
+        <div class="align_center" style="padding-top:10px">
+            <!--!-->
+            <p>
+                @*@Cuerpo*@ 
+                @((MarkupString)Cuerpo)
+            </p>
+            <!--!-->
+        </div>
+
+
+        <div class="align_center" style="padding-top: 10px; margin-left:-21px">
+            <!--!-->
+            <button @onclick="cerrarVentana" class="button type1"><span><span style="color:white">Cerrar</span><span>Cerrar</span></span></button>
+            <!--!-->
+        </div>
+
+
+        <a id="closePopup" @onclick="cerrarVentana"></a>
+    </div>
+</div>
+
+@code {
+
+    [Parameter] public string Titulo { get; set; }
+    [Parameter] public string Cuerpo { get; set; }
+    [Parameter] public string Estilo { get; set; }
+    [Parameter] public EventCallback cerrarVentana { get; set; }
+
+
+    //private string cerrar = "";
+    //private bool esCerrar = true;
+
+    //private void cerrarEvento()
+    //{
+    //    cerrar = esCerrar == true ? "display: none;" : "";
+    //}
+
+}

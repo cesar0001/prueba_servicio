@@ -1,0 +1,12 @@
+﻿.cambio_color {
+    color: #000000;
+}
+
+
+.angotar {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline #015AAA;
+}

@@ -1,0 +1,78 @@
+﻿
+<div class="container">
+    <div class="row">
+        <div class="col-1">
+            <!--<img src="./image/l2/png/featured-job-logo-1.png" alt="">-->
+        </div>
+        <div class="col-11">
+            <h3 class="mb-0" style="margin-bottom: -6px !important ">
+                <b class="titulo">@educacion.Titulo</b>
+            </h3>
+            <b class="titulo">
+               Educacion @educacion.Nivel_Estudio
+            </b><br />
+            <small class="color_negro"> @educacion.Desde.ToString("dd-MM-yyyy") - @educacion.Hasta </small>
+
+            <br />@*<small class="color_negro">@educacion.Departamento.Nombre - @educacion.Estado.Nombre</small>*@
+            <div class="d-flex align-items-center justify-content-between" style="margin-bottom:24px">
+                <small class="color_negro">@educacion.Departamento.Nombre - @educacion.Estado.Nombre</small>
+                <div>
+                    <a href="javascript:" style="font-weight: 600; font-size: 13px; text-decoration: none; background-color: transparent;" @onclick="@Modificar">Editar</a>
+                    <a class="text-danger"
+                       href="javascript:" style="font-weight: 600; font-size: 13px; text-decoration: none; background-color: transparent;" @onclick="@Eliminar">Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ventanaEliminar == true)
+{
+    <Modal confirmacion="@tomandoData" Mensaje="@mensaje" Titulo="@titulo" Estilo="@estilo" cerrarVentana="@(() => cerrarModal())"></Modal>
+}
+
+
+@code
+{
+    [Parameter] public Educacion educacion { get; set; }
+    [Parameter] public EventCallback<Educacion> EliminarEducacion { get; set; }
+    [Parameter] public EventCallback<int> ModificarEducacion { get; set; }
+
+
+    bool ventanaEliminar = false;
+
+    private string titulo = "Educacion", estilo = "", mensaje = "";
+
+    private async Task Eliminar()
+    {
+        mensaje = educacion.Titulo;
+        ventanaEliminar = true;
+        //await EliminarExperienciaLab.InvokeAsync(experiencia_laboral);
+    }
+
+    private async Task Modificar()
+    {
+        await ModificarEducacion.InvokeAsync(educacion.Id);
+
+    }
+
+    private async Task tomandoData(bool confirmo)
+    {
+
+        if (confirmo == true)
+        {
+            await EliminarEducacion.InvokeAsync(educacion);
+            await cerrarModal();
+            //Console.WriteLine("Ventana ListaEducacion");
+
+        }
+    }
+
+    private async Task cerrarModal()
+    {
+
+        ventanaEliminar = !ventanaEliminar;
+        estilo = ventanaEliminar == true ? "display: none;" : "";
+    }
+
+}

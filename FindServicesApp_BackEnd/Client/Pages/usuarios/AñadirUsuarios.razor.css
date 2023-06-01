@@ -1,0 +1,65 @@
+﻿.cambio_color {
+    color: #000000;
+}
+
+select:focus {
+    outline: none;
+}
+
+.valid.modified:not([type=checkbox]) {
+    /*outline: 1px solid #26b050;*/
+    outline: none;
+
+}
+
+/*.invalid {
+    outline: 1px solid red;*/
+    /*border-bottom: 1px solid red;*/
+/*}*/
+
+.validation-message {
+    color: red;
+}
+
+
+
+.container_interno {
+    max-width: 700px;
+    width: 100%;
+}
+
+.wrapp-input {
+    position: relative;
+    width: 100%;
+    min-height: 50px;
+}
+
+    .wrapp-input input {
+        background: transparent;
+        text-align: left;
+        width: 100%;
+        border: 1px solid #4e4e4e;
+        line-height: inherit;
+        height: 40px;
+        padding: 10px 15px;
+        -webkit-transition: all .3s ease;
+        -o-transition: all .3s ease;
+        transition: all .3s ease;
+    }
+
+        .wrapp-input input:focus {
+            /*border: 4px solid steelblue;*/
+        }
+
+/*estilo icon*/
+.icon-aye {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+    .icon-aye:hover {
+        /*color: #015AAA;*/
+    }

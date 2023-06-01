@@ -1,0 +1,431 @@
+﻿@using System.Text.Json;
+
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+@using System.Text.RegularExpressions
+ 
+@using System.Globalization
+@using System.Text;
+
+@*style="display: none;"*@
+<div class="popup_holder subscribe14" style="@Estilo">
+    <div class="popup" style="border-radius: 4px; padding: 20px; margin-top: 14px; margin-bottom:14px">
+
+        <div class="align_center" style="padding-top:10px">
+            <!--!-->
+            <h2>
+                @*Refer*@ <span>@Titulo</span>
+            </h2>
+            <!--!-->
+        </div>
+
+
+
+        <div class="container" style="background: white; max-width: 100%; padding-left: 0px; padding-right: 0px ">
+
+            <div class="row">
+
+
+
+                <div class="col-sm-12">
+                    <br />
+
+                    <EditForm Model="Experiencia_Laboral" OnValidSubmit="@EnviarData" class="form_type_1 type_2">
+                        <DataAnnotationsValidator />
+
+
+                        <div class="row">
+
+                            <div class="col-12 col-md-12 col-ms-12">
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Posicion Laboral</label>
+                                    <InputText style="color: #000000" class="cambio_color" placeholder="Ingresa la Posicion Laboral" @bind-Value="@Experiencia_Laboral.Posicion_Laboral" />
+                                    <ValidationMessage For="@(() => Experiencia_Laboral.Posicion_Laboral)" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-ms-6">
+
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Compañia </label>
+                                    <InputText style="color: #000000" class="cambio_color" placeholder="Ingresa la Compañia" @bind-Value="@Experiencia_Laboral.Compañia" />
+                                    <ValidationMessage For="@(() => Experiencia_Laboral.Compañia)" />
+                                </div>
+
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Salario </label>
+                                    <InputNumber style="color: #000000" class="cambio_color" placeholder="Ingresa el Salario" @bind-Value="@Experiencia_Laboral.Salario" />
+                                    <ValidationMessage For="@(() => Experiencia_Laboral.Salario)" />
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 col-ms-6">
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Departamentos</label>
+                                    <div class="custom_select">
+                                        <InputSelectNumber ValueChanged="@((int value) => ValorPaisCambiado(value))"
+                                                           ValueExpression="@(() => Experiencia_Laboral.DepartamentoId)"
+                                                           Value="Experiencia_Laboral.DepartamentoId"
+                                                           style="z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ">
+                                            <option value="0">Seleccione un Departamento</option>
+                                            @foreach (var item in Departamentos)
+                                            {
+
+                                                @if (item.Id == Experiencia_Laboral.DepartamentoId)
+                                                {
+                                                    <option selected value="@item.Id">@item.Nombre</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@item.Id">@item.Nombre</option>
+                                                }
+                                            }
+                                        </InputSelectNumber>
+                                        @if (estaSeleccionadoDepto == true)
+                                        {
+                                            <div class="validation-message">* El Campo Departamentos es Obligatorio.</div>
+
+                                        }
+                                        @*<ValidationMessage For="@(() => datos.Genero)" />*@
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Municipios</label>
+                                    <div class="custom_select">
+
+                                        <InputSelectNumber ValueChanged="@((int value) => aa(value))"
+                                                           ValueExpression="@(() => Experiencia_Laboral.MunicipioId)"
+                                                           Value="Experiencia_Laboral.MunicipioId"
+                                                           style="z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ">
+                                            <option value="0">Seleccione un Municipio</option>
+                                            @foreach (var item in Municipio)
+                                            {
+
+                                                @if (item.Id == Experiencia_Laboral.MunicipioId)
+                                                {
+                                                    <option selected value="@item.Id">@item.Nombre</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@item.Id">@item.Nombre</option>
+                                                }
+                                            }
+                                        </InputSelectNumber>
+
+                                        @if (estaSeleccionadoMunicipio == true)
+                                        {
+                                            <div class="validation-message">* El Campo Municipios es Obligatorio. </div>
+
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            @* por si queremos todo el espacio *@
+
+                            <div class="col-12 col-md-12 col-ms-12">
+                                <div class="control-group">
+                                    <div class="control-group">
+                                        <label class="control-label cambio_color">Descripcion(Funciones del puesto) </label>
+
+                                        <InputTextArea rows="4"
+                                                       cols="50"
+                                                       style="color: #000000; z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; width: 100%; height: 116px; color: #000000; outline: none !important; "
+                                                       Class="form-control cambio_color"
+                                                       placeholder="Manejo de Inventarios, Cierre de caja, facturación, Compras, Programador ERP, Manejo del sistema SAP/AS400, ETC"
+                                                       @bind-Value="@Experiencia_Laboral.Descripcion"></InputTextArea>
+
+                                        <ValidationMessage For="@(() => Experiencia_Laboral.Descripcion)" />
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6 col-md-6 col-ms-6">
+
+                                <label class="control-label cambio_color">Desde </label>
+                                <InputDate style="z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important;"
+                                           Class="form-control cambio_color"
+                                           @bind-Value="@Experiencia_Laboral.Desde" />
+                                <ValidationMessage For="@(() => Experiencia_Laboral.Desde)" />
+
+                            </div>
+
+                            <div class="col-6 col-md-6 col-ms-6">
+
+                                <label class="control-label cambio_color">Hasta </label>
+                                <InputDate max="@DateTime.Now.ToString("yyyy-MM-dd")" style="z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important;"
+                                           Class="form-control cambio_color"
+                                           @bind-Value="@Fecha_hasta" />
+
+                                <p class="parrafo_chiquito">
+                                    Si este es su trabajo actual dejar esta fecha en blanco.
+                                </p>
+                            </div>
+
+                            <div class="align_center" style="padding-top:10px">
+
+                                <div class="col-12 col-md-12 col-ms-12">
+                                    <div class="control-group">
+
+                                        @*<button  @onclick="@btnClose"  class="button type1"><span><span style="color:white">Cerrar</span><span>Cerrar</span></span></button>*@
+
+
+                                        <button @onclick="eventoEstilo"  type="submit" class="button type1">
+                                            <span><span style="color:white">Guardar</span><span>Guardar</span></span>
+                                        </button>
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                        </div>
+
+
+                        <br />
+
+                    </EditForm>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+        <a id="closePopup" @onclick="cerrarVentana"></a>
+    </div>
+</div>
+
+@code {
+
+    [Parameter] public int id_experiencia_lab { get; set; }
+    [Parameter] public string Titulo { get; set; }
+    [Parameter] public int id_usuario { get; set; }
+    [Parameter] public string Estilo { get; set; }
+    [Parameter] public EventCallback<Experiencia_Laboral> CrearOModificar { get; set; }
+    [Parameter] public EventCallback cerrarVentana { get; set; }
+    [Parameter] public EventCallback<bool> btncerrar { get; set; }
+
+
+    List<Departamentos> Departamentos { get; set; } = new List<Departamentos>();
+    List<Municipio> Municipio { get; set; } = new List<Municipio>();
+
+    private bool estaSeleccionadoDepto = false,
+        estaSeleccionadoMunicipio = false;
+
+    private DateTime? Fecha_hasta;
+
+    Experiencia_Laboral Experiencia_Laboral = new Experiencia_Laboral();
+    IJSObjectReference module;
+
+    protected override async Task OnInitializedAsync()
+    {
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+
+        Experiencia_Laboral.RegistroUsuarioId = id_usuario;
+        await TenerTodoDepartamento();
+
+        if (id_experiencia_lab == 0)
+        {
+            //Console.WriteLine("ESTA NULL mejor dicho 0");
+            Experiencia_Laboral.Desde = DateTime.Now;
+        }
+        else
+        {
+            try
+            {
+
+                var response_data = await Http.GetAsync($"api/ExperienciaLaboral/tener/experiencia/individual/{id_experiencia_lab}");
+                response_data.EnsureSuccessStatusCode();
+
+                Respuesta res = await response_data.Content.ReadFromJsonAsync<Respuesta>();
+                await CargarMunicipio(res.experiencia_lab.DepartamentoId);
+                Experiencia_Laboral.Id = res.experiencia_lab.Id;
+                Experiencia_Laboral.RegistroUsuarioId = res.experiencia_lab.RegistroUsuarioId;
+                Experiencia_Laboral.Posicion_Laboral = res.experiencia_lab.Posicion_Laboral;
+                Experiencia_Laboral.Compañia = res.experiencia_lab.Compañia;
+                Experiencia_Laboral.Salario = res.experiencia_lab.Salario;
+                Experiencia_Laboral.MunicipioId = res.experiencia_lab.MunicipioId;
+                Experiencia_Laboral.DepartamentoId = res.experiencia_lab.DepartamentoId;
+                Experiencia_Laboral.Descripcion = res.experiencia_lab.Descripcion;
+                Experiencia_Laboral.Desde = res.experiencia_lab.Desde;
+
+
+                if (res.experiencia_lab.Hasta == "Actualidad")
+                {
+                    Experiencia_Laboral.Hasta = "Actualidad";
+                }
+                else
+                {
+                    Fecha_hasta = DateTime.ParseExact(res.experiencia_lab.Hasta, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                await mostrarOverFlow();
+                navigationManager.NavigateTo("logout");
+
+            }
+
+        }
+
+
+
+        await module.InvokeVoidAsync("cambiarOverflow");
+
+
+
+    }
+
+
+    private async Task ValorPaisCambiado(int value)
+    {
+
+        Experiencia_Laboral.DepartamentoId = value;
+
+        if (Experiencia_Laboral.DepartamentoId == 0)
+        {
+            estaSeleccionadoDepto = true;
+            estaSeleccionadoMunicipio = false;
+            Municipio.Clear();
+        }
+        else
+        {
+            estaSeleccionadoDepto = false;
+            estaSeleccionadoMunicipio = true;
+            await CargarMunicipio(value);
+        }
+
+        //await CambiarDepartamentos.InvokeAsync(value);
+
+
+    }
+
+    private async Task CargarMunicipio(int deptoId)
+    {
+        try
+        {
+
+            var response = await Http.GetAsync($"api/Deptos/municipios/{deptoId}");
+            response.EnsureSuccessStatusCode();
+
+            Municipio = await response.Content.ReadFromJsonAsync<List<Municipio>>();
+            //Municipio = await Http.GetFromJsonAsync<List<Municipio>>($"api/Deptos/municipios/{deptoId}");
+
+
+        }
+        catch (Exception ex)
+        {
+            await mostrarOverFlow();
+            navigationManager.NavigateTo("logout");
+        }
+    }
+
+    private async Task TenerTodoDepartamento()
+    {
+        try
+        {
+
+            var response = await Http.GetAsync("api/Deptos/tener/deptos");
+            response.EnsureSuccessStatusCode();
+            Departamentos = await response.Content.ReadFromJsonAsync<List<Departamentos>>();
+
+        }
+        catch (Exception ex)
+        {
+            navigationManager.NavigateTo("logout");
+        }
+    }
+
+    private async Task aa(int value)
+    {
+        Experiencia_Laboral.MunicipioId = value;
+
+        if (Experiencia_Laboral.MunicipioId == 0)
+        {
+            estaSeleccionadoMunicipio = true;
+        }
+        else
+        {
+            estaSeleccionadoMunicipio = false;
+
+        }
+
+
+    }
+
+    private void eventoEstilo()
+    {
+        if (Experiencia_Laboral.DepartamentoId == 0)
+        {
+            estaSeleccionadoDepto = true;
+        }
+        else
+        {
+            estaSeleccionadoDepto = false;
+
+        }
+
+        if (Experiencia_Laboral.MunicipioId == 0)
+        {
+            estaSeleccionadoMunicipio = true;
+        }
+        else
+        {
+            estaSeleccionadoMunicipio = false;
+
+        }
+    }
+
+    private async Task EnviarData()
+    {
+        if (Fecha_hasta == null)
+        {
+            Experiencia_Laboral.Hasta = "Actualidad";
+        }
+        else
+        {
+            Experiencia_Laboral.Hasta = Fecha_hasta?.ToString("dd-MM-yyyy");
+        }
+
+
+
+        if(estaSeleccionadoDepto==false && estaSeleccionadoMunicipio==false)
+        {
+            await btncerrar.InvokeAsync(true);
+            await CrearOModificar.InvokeAsync(Experiencia_Laboral);
+
+        }
+
+
+        //await mostrarOverFlow();
+    }
+
+
+    private async Task btnClose()
+    {
+        await btncerrar.InvokeAsync(false);
+        //await mostrarOverFlow();
+        //await cerrarVentana.InvokeAsync();
+    }
+
+
+    private async Task mostrarOverFlow()
+    {
+
+        await module.InvokeVoidAsync("cambiarOverflowActivo");
+    }
+
+}

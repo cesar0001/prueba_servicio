@@ -1,0 +1,441 @@
+﻿@using System.Text.Json;
+
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+@using System.Text.RegularExpressions
+
+@using System.Globalization
+@using System.Text;
+
+@*style="display: none;"*@
+<div class="popup_holder subscribe14" style="@Estilo">
+    <div class="popup" style="border-radius: 4px; padding: 20px; margin-top: 14px; margin-bottom:14px">
+
+        <div class="align_center" style="padding-top:10px">
+            <!--!-->
+            <h2>
+                @*Refer*@ <span>@Titulo</span>
+            </h2>
+            <!--!-->
+        </div>
+
+
+
+        <div class="container" style="background: white; max-width: 100%; padding-left: 0px; padding-right: 0px ">
+
+            <div class="row">
+
+
+
+                <div class="col-sm-12">
+                    <br />
+
+                    <EditForm Model="Modelo_Educacion" OnValidSubmit="@EnviarData" class="form_type_1 type_2">
+                        <DataAnnotationsValidator />
+
+
+                        <div class="row">
+
+
+                            <div class="col-md-12 col-ms-12">
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Titulo</label>
+                                    <InputText style="color: #000000" class="cambio_color" placeholder="Titulo" @bind-Value="@Modelo_Educacion.Titulo" />
+                                    <ValidationMessage For="@(() => Modelo_Educacion.Titulo)" />
+                                </div>
+
+
+
+                            </div>
+
+                            <div class="col-md-12 col-ms-12">
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Centro de Estudio</label>
+                                    <InputText style="color: #000000" class="cambio_color" placeholder="Centro de Estudio" @bind-Value="@Modelo_Educacion.Centro_Estudio" />
+                                    <ValidationMessage For="@(() => Modelo_Educacion.Centro_Estudio)" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-ms-6">
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Modalidad de Estudio</label>
+                                    <div class="custom_select">
+                                        <InputSelect @bind-Value="@Modelo_Educacion.Modalidad_Estudio" class="cambio_color custom_select select_title" style="width: 100%; height: 40px; color: #000000 ">
+                                            <option value="" selected>Seleccione la Modalidad</option>
+                                            <option value="Presencial">Presencial</option>
+                                            <option value="Virtual">Virtual</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => Modelo_Educacion.Modalidad_Estudio)" />
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6 col-ms-6">
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Nivel de Estudio</label>
+                                    <div class="custom_select">
+                                        <InputSelect @bind-Value="@Modelo_Educacion.Nivel_Estudio" class="cambio_color custom_select select_title" style="width: 100%; height: 40px; color: #000000 ">
+                                            <option value="" selected>Seleccione la Nivel de Estudio</option>
+                                            <option value="Cualquiera">Cualquiera</option>
+                                            <option value="Primaria">Primaria</option>
+                                            <option value="Basico">Basico</option>
+                                            <option value="Diversificado">Diversificado</option>
+                                            <option value="Tecnico">Tecnico</option>
+                                            <option value="Pregrado/Licenciatura">Pregrado/Licenciatura</option>
+                                            <option value="Postgrado">Postgrado</option>
+                                            <option value="Doctorado">Doctorado</option>
+                                            <option value="Diplomado">Diplomado</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => Modelo_Educacion.Nivel_Estudio)" />
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6 col-ms-6">
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Departamentos</label>
+                                    <div class="custom_select">
+                                        <InputSelectNumber ValueChanged="@((int value) => ValorPaisCambiado(value))"
+                                                           ValueExpression="@(() => Modelo_Educacion.DepartamentoId)"
+                                                           Value="Modelo_Educacion.DepartamentoId"
+                                                           style="z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ">
+                                            <option value="0">Seleccione un Departamento</option>
+                                            @foreach (var item in Departamentos)
+                                            {
+
+                                                @if (item.Id == Modelo_Educacion.DepartamentoId)
+                                                {
+                                                    <option selected value="@item.Id">@item.Nombre</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@item.Id">@item.Nombre</option>
+                                                }
+                                            }
+                                        </InputSelectNumber>
+                                        @if (estaSeleccionadoDepto == true)
+                                        {
+                                            <div class="validation-message">* El Campo Departamentos es Obligatorio.</div>
+
+                                        }
+                                        @*<ValidationMessage For="@(() => datos.Genero)" />*@
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <div class="col-md-6 col-ms-6">
+
+                                <div class="control-group">
+                                    <label class="control-label cambio_color">Municipios</label>
+                                    <div class="custom_select">
+
+                                        <InputSelectNumber ValueChanged="@((int value) => aa(value))"
+                                                           ValueExpression="@(() => Modelo_Educacion.MunicipioId)"
+                                                           Value="Modelo_Educacion.MunicipioId"
+                                                           style="z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important; ">
+                                            <option value="0">Seleccione un Municipio</option>
+                                            @foreach (var item in Municipio)
+                                            {
+
+                                                @if (item.Id == Modelo_Educacion.MunicipioId)
+                                                {
+                                                    <option selected value="@item.Id">@item.Nombre</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@item.Id">@item.Nombre</option>
+                                                }
+                                            }
+                                        </InputSelectNumber>
+
+                                        @if (estaSeleccionadoMunicipio == true)
+                                        {
+                                            <div class="validation-message">* El Campo Municipios es Obligatorio. </div>
+
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-6 col-md-6 col-ms-6">
+                                <label class="control-label cambio_color">Desde </label>
+                                <InputDate style="z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important;"
+                                           Class="form-control cambio_color"
+                                           @bind-Value="@Modelo_Educacion.Desde" />
+                                <ValidationMessage For="@(() => Modelo_Educacion.Desde)" />
+
+                            </div>
+
+                            <div class="col-6 col-md-6 col-ms-6">
+
+                                <label class="control-label cambio_color">Hasta </label>
+                                <InputDate max="@DateTime.Now.ToString("yyyy-MM-dd")" style="z-index: 1; background: #fff; border: 1px solid #4e4e4e; padding: 10px 10px; cursor: pointer; width: 100%; height: 40px; color: #000000; outline: none !important;"
+                                           Class="form-control cambio_color"
+                                           @bind-Value="@Fecha_hasta" />
+
+                                <p class="parrafo_chiquito">
+                                    Si este es su trabajo actual dejar esta fecha en blanco.
+                                </p>
+                            </div>
+
+                            <div class="align_center" style="padding-top:10px">
+
+                                <div class="col-12 col-md-12 col-ms-12">
+                                    <div class="control-group">
+
+
+
+                                        <button @onclick="eventoEstilo" type="submit" class="button type1">
+                                            <span><span style="color:white">Guardar</span><span>Guardar</span></span>
+                                        </button>
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                        </div>
+
+
+                        <br />
+
+                    </EditForm>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+        <a id="closePopup" @onclick="cerrarVentana"></a>
+    </div>
+</div>
+
+@code {
+
+    [Parameter] public int id_educacion { get; set; }
+    [Parameter] public string Titulo { get; set; }
+    [Parameter] public int id_usuario { get; set; }
+    [Parameter] public string Estilo { get; set; }
+    [Parameter] public EventCallback<Educacion> CrearOModificar { get; set; }
+    [Parameter] public EventCallback cerrarVentana { get; set; }
+    //[Parameter] public EventCallback<bool> btncerrar { get; set; }
+
+
+    List<Departamentos> Departamentos { get; set; } = new List<Departamentos>();
+    List<Municipio> Municipio { get; set; } = new List<Municipio>();
+
+    private bool estaSeleccionadoDepto = false,
+        estaSeleccionadoMunicipio = false;
+
+    private DateTime? Fecha_hasta;
+
+    Educacion Modelo_Educacion = new Educacion();
+    IJSObjectReference module;
+
+    protected override async Task OnInitializedAsync()
+    {
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+
+        Modelo_Educacion.RegistroUsuarioId = id_usuario;
+        await TenerTodoDepartamento();
+
+        if (id_educacion == 0)
+        {
+            //Console.WriteLine("ESTA NULL mejor dicho 0");
+            Modelo_Educacion.Desde = DateTime.Now;
+        }
+        else
+        {
+            try
+            {
+
+                var response_data = await Http.GetAsync($"api/Educaciones/tener/educacion/individual/{id_educacion}");
+                response_data.EnsureSuccessStatusCode();
+
+                Respuesta res = await response_data.Content.ReadFromJsonAsync<Respuesta>();
+                await CargarMunicipio(res.modelo_educacion.DepartamentoId);
+                Modelo_Educacion.Id = res.modelo_educacion.Id;
+                Modelo_Educacion.RegistroUsuarioId = res.modelo_educacion.RegistroUsuarioId;
+                Modelo_Educacion.Titulo = res.modelo_educacion.Titulo;
+                Modelo_Educacion.Centro_Estudio = res.modelo_educacion.Centro_Estudio;
+                Modelo_Educacion.Modalidad_Estudio = res.modelo_educacion.Modalidad_Estudio;
+                Modelo_Educacion.Nivel_Estudio = res.modelo_educacion.Nivel_Estudio;
+                Modelo_Educacion.MunicipioId = res.modelo_educacion.MunicipioId;
+                Modelo_Educacion.DepartamentoId = res.modelo_educacion.DepartamentoId;
+                Modelo_Educacion.MunicipioId = res.modelo_educacion.MunicipioId;
+
+
+
+                Modelo_Educacion.Desde = res.modelo_educacion.Desde;
+
+
+                if (res.modelo_educacion.Hasta == "Actualidad")
+                {
+                    Modelo_Educacion.Hasta = "Actualidad";
+                }
+                else
+                {
+                    Fecha_hasta = DateTime.ParseExact(res.modelo_educacion.Hasta, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                await mostrarOverFlow();
+                navigationManager.NavigateTo("logout");
+
+            }
+
+        }
+
+
+
+        //await module.InvokeVoidAsync("cambiarOverflow");
+
+
+
+    }
+
+    private void eventoEstilo()
+    {
+        if (Modelo_Educacion.DepartamentoId == 0)
+        {
+            estaSeleccionadoDepto = true;
+        }
+        else
+        {
+            estaSeleccionadoDepto = false;
+
+        }
+
+        if (Modelo_Educacion.MunicipioId == 0)
+        {
+            estaSeleccionadoMunicipio = true;
+        }
+        else
+        {
+            estaSeleccionadoMunicipio = false;
+
+        }
+    }
+
+    private async Task ValorPaisCambiado(int value)
+    {
+
+        Modelo_Educacion.DepartamentoId = value;
+
+        if (Modelo_Educacion.DepartamentoId == 0)
+        {
+            estaSeleccionadoDepto = true;
+            estaSeleccionadoMunicipio = false;
+            Municipio.Clear();
+        }
+        else
+        {
+            estaSeleccionadoDepto = false;
+            estaSeleccionadoMunicipio = true;
+            await CargarMunicipio(value);
+        }
+
+        //await CambiarDepartamentos.InvokeAsync(value);
+
+
+    }
+
+    private async Task CargarMunicipio(int deptoId)
+    {
+        try
+        {
+
+            var response = await Http.GetAsync($"api/Deptos/municipios/{deptoId}");
+            response.EnsureSuccessStatusCode();
+
+            Municipio = await response.Content.ReadFromJsonAsync<List<Municipio>>();
+            //Municipio = await Http.GetFromJsonAsync<List<Municipio>>($"api/Deptos/municipios/{deptoId}");
+
+
+        }
+        catch (Exception ex)
+        {
+            //await mostrarOverFlow();
+            navigationManager.NavigateTo("logout");
+        }
+    }
+
+    private async Task TenerTodoDepartamento()
+    {
+        try
+        {
+
+            var response = await Http.GetAsync("api/Deptos/tener/deptos");
+            response.EnsureSuccessStatusCode();
+            Departamentos = await response.Content.ReadFromJsonAsync<List<Departamentos>>();
+
+        }
+        catch (Exception ex)
+        {
+            navigationManager.NavigateTo("logout");
+        }
+    }
+
+    private async Task aa(int value)
+    {
+        Modelo_Educacion.MunicipioId = value;
+
+        if (Modelo_Educacion.MunicipioId == 0)
+        {
+            estaSeleccionadoMunicipio = true;
+        }
+        else
+        {
+            estaSeleccionadoMunicipio = false;
+
+        }
+
+
+    }
+
+    private async Task EnviarData()
+    {
+        if (Fecha_hasta == null)
+        {
+            Modelo_Educacion.Hasta = "Actualidad";
+        }
+        else
+        {
+            Modelo_Educacion.Hasta = Fecha_hasta?.ToString("dd-MM-yyyy");
+        }
+
+        if (estaSeleccionadoDepto == false && estaSeleccionadoMunicipio == false)
+        {
+            await CrearOModificar.InvokeAsync(Modelo_Educacion);
+        }
+
+        //await btncerrar.InvokeAsync(true);
+        //await CrearOModificar.InvokeAsync(Modelo_Educacion);
+
+
+    }
+
+    private async Task mostrarOverFlow()
+    {
+
+        await module.InvokeVoidAsync("cambiarOverflowActivo");
+    }
+
+}

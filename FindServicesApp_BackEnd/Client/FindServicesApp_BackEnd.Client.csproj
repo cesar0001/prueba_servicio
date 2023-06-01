@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+	<TargetFramework>net6.0</TargetFramework>
+	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<Compile Remove="wwwroot\estilo_plantilla\**" />
+	<Content Remove="wwwroot\estilo_plantilla\**" />
+	<EmbeddedResource Remove="wwwroot\estilo_plantilla\**" />
+	<None Remove="wwwroot\estilo_plantilla\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.15" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.14" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.14" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\Shared\FindServicesApp_BackEnd.Shared.csproj" />
+  </ItemGroup>
+ 
+
+</Project>

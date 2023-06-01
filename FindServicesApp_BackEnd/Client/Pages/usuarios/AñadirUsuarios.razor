@@ -1,0 +1,253 @@
+﻿@page "/crear-usuarios"
+@using System.Text.Json;
+
+@inject HttpClient Http
+@inject NavigationManager Navigator
+@inject ILoginService loginService
+@using FindServicesApp_BackEnd.Client.Auth
+
+@inject IJSRuntime JSRuntime
+@*<p>@Navigator.ToBaseRelativePath(Navigator.Uri)</p>*@
+<div class="header_wrapper">
+
+    @*<div class="container">
+            <div class="submit_section">
+
+                <h2 class="main_title">Get a Free Quote</h2>
+                <p>We pride ourselves on our reliability, a friendly approach and most importantly, our knowledge of the industry. </p>
+                <a href="#" class="button type1"><span><span>Contact Us</span><span>Contact Us</span></span></a>
+
+            </div>
+        </div>*@
+    <div class="contact_page">
+        <div class="mad_section">
+            <div class="container" style="border-radius: 4px 4px 4px 4px;background: white; border-top: 3px solid #fff; max-width: 550px; -webkit-box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); -moz-box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); ">
+                @*<h2>Contact Us</h2>*@
+                <div class="row">
+
+
+
+                    <div class="col-sm-12">
+                        <br />
+                        <h4 style="text-align:center;font-size: 25px;font-weight: bold;">Registro de Usuario</h4>
+                        <EditForm Model="usuario" OnValidSubmit="CrearUsuario" class="form_type_1 type_2">
+                            <DataAnnotationsValidator />
+
+                            <div class="control-group">
+                                <label class="control-label cambio_color">Correo</label>
+                                <InputText style="color: #000000" class="cambio_color" placeholder="Ingresa tu correo electronico" name="textinput" @bind-Value="@usuario.Email" />
+                                <ValidationMessage For="@(() => usuario.Email)" />
+                            </div>
+
+                            @*<div class="control-group">
+            <label class="control-label cambio_color">Contraseña</label>
+            <InputText style="color: #000000" type="password" Class="form-control cambio_color" placeholder="Introducir la contraseña " @bind-Value="@usuario.Password" />
+            <ValidationMessage For="@(() => usuario.Password)" />
+        </div>*@
+                            <div class="control-group">
+                                <label class="control-label cambio_color">Contraseña</label>
+
+                                <div class="container_interno" style=" max-width: 700px; width: 100%;">
+                                    <div class="wrapp-input" style="position: relative; width: 100%; min-height: 50px;">
+                                        <span class="icon-aye" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" @onclick="TogglePasswordVisibility">
+                                            <i style="color:black" class="@PasswordIcon"></i>
+                                        </span>
+
+                                        <InputText @bind-Value="@usuario.Password"
+                                                   style="color: #000000; background: transparent; text-align: left; width: 100%; border: 1px solid #4e4e4e; line-height: inherit; height: 40px; padding: 10px 15px; -webkit-transition: all .3s ease; -o-transition: all .3s ease; transition: all .3s ease;"
+                                                   type="@isPassword"
+                                                   placeholder="Introducir la Contraseña" />
+
+                                    </div>
+
+
+                                </div>
+
+                                <ValidationMessage For="@(() => usuario.Password)" />
+                            </div>
+
+
+                            <div class="control-group">
+                                <label class="control-label cambio_color">Tipo de Usuario</label>
+                                <div class="custom_select">
+                                    <InputSelect @bind-Value="@usuario.id_roll" class="cambio_color custom_select select_title" style="width: 100%; height: 40px; color: #000000 ">
+                                        <option value="" selected>Seleccione un Usuario</option>
+                                        <option value="1">Proveedor de Servicios</option>
+                                        <option value="2">Cliente</option>
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => usuario.id_roll)" />
+                                </div>
+                            </div>
+
+
+                            <div style="padding-top:10px" class="align_center control-group form-elements">
+                                @*<span class="cambio_color">Checkbox</span>*@
+                                <input type="checkbox" @bind-value="@check" checked="@(check?"checked":null)" id="checkbox_3"><label for="checkbox_3">Acepto</label>
+                                <a class="angotar" href="#">
+                                    <label style="color: #015AAA; cursor: pointer; ">Término y Condiciones cliente</label>
+                                </a>
+
+                            </div>
+
+                            <div class="align_center" style="padding-top:10px">
+                                <button type="submit" class="button type1" style="width:100%">
+                                    <span><span style="color:white">Registrar</span><span>Registrar</span></span>
+                                </button>
+                            </div>
+
+                            <br />
+
+                            @*<select class="form-control select2  "
+                                    style="width: 100%"
+                                    aria-hidden="true">
+                                <option selected="selected">Alabama</option>
+                                <option>Alaska</option>
+                                <option>California</option>
+                                <option>Delaware</option>
+                                <option>Tennessee</option>
+                                <option>Texas</option>
+                                <option>Washington</option>
+                            </select>
+
+                            <br />*@
+
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+@if (AbrirModal == true)
+{
+    <MensajeModal Estilo="@estilo" Titulo="@titulo" Cuerpo="@mensaje" cerrarVentana="@(() => cerrarModal())"></MensajeModal>
+}
+
+@if (preloader == true)
+{
+    <Preloader></Preloader>
+}
+
+
+
+
+@code {
+
+
+
+    private RegistroUsuario usuario = new RegistroUsuario();
+
+
+    private bool check = true, preloader = false;
+    private bool AbrirModal = false;
+    private string titulo = "", mensaje = "", estilo = "";
+
+
+    private bool IsPasswordVisible { get; set; } = false;
+    private string PasswordIcon => IsPasswordVisible ? "fa fa-eye-slash" : "fa fa-eye";
+    private string isPassword => IsPasswordVisible ? "text" : "password";
+
+
+    private void TogglePasswordVisibility()
+    {
+        IsPasswordVisible = !IsPasswordVisible;
+    }
+
+
+    async Task CrearUsuario()
+    {
+
+        //StateHasChanged();
+        //    await InvokeAsync(StateHasChanged);
+
+        AbrirModal = false;
+        preloader = true;
+        if (check == true)
+        {
+
+
+            //Console.WriteLine(check);
+            var response = await Http.PostAsJsonAsync("api/usuarios/crearUsuario", usuario);
+            if (response.IsSuccessStatusCode)
+            {
+
+                //Console.WriteLine(await response.Content.ReadAsStringAsync());
+
+                Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+                //Console.WriteLine(respuesta.res);
+
+                if (respuesta.res == "true")
+                {
+                    await loginService.Login(respuesta.token.ToString());
+                    Navigator.NavigateTo("configuracion-personal");
+                    mensaje = $"Se ha Registrado el Correo: {usuario.Email} Exitosamente!!!";
+                    titulo = "Registro de Usuarios";
+                    preloader = false;
+                }
+                else
+                {
+                    mensaje = $"El Correo {usuario.Email} ya Existen Intente con otro correo.";
+                    titulo = "Registro de Usuarios";
+                    AbrirModal = true;
+                    preloader = false;
+                }
+
+
+
+
+                //Console.WriteLine(respuesta.otro);
+            }
+            else
+            {
+                if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+                {
+
+                    //en teoria seria mandarlo al login por si se vence el token
+                }
+            }
+        }
+        else
+        {
+
+
+            mensaje = $"Para Poder Registrar una cuenta debe de aceptar los terminos y condiciones.";
+            titulo = "Registro de Usuarios";
+            AbrirModal = true;
+        }
+
+
+
+    }
+
+
+
+    private void cerrarModal()
+    {
+        AbrirModal = !AbrirModal;
+        estilo = AbrirModal == true ? "display: none;" : "";
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        //await metodo();
+    }
+
+    private async Task metodo()
+    {
+        IJSObjectReference module;
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+        await module.InvokeVoidAsync("uso");
+
+    }
+
+}
+
+
+

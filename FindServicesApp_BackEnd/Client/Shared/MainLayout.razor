@@ -1,0 +1,69 @@
+﻿@inherits LayoutComponentBase
+
+@inject NavigationManager Navigator
+@*<p>@Navigator.ToBaseRelativePath(Navigator.Uri)</p>*@
+
+
+
+
+@*<AuthorizeView>
+        <Authorized>
+            Hello, @context.User.Identity?.Name!
+        </Authorized>
+        <NotAuthorized>
+            Usted no está autorizado
+        </NotAuthorized>
+        <Authorizing>
+            Autorizando
+        </Authorizing>
+    </AuthorizeView>*@
+
+
+
+<div id="wrapper" class="@NavMenuCssClass" style="@NavMenuCssClassStyle">
+
+    @if (!(linkMarcado() == "contrato-personal"))
+    {
+        <NavMenu ToggleNavMenu="@(() => ToggleNavMenu())" />
+    }
+
+
+    <div id="content">
+        @Body
+    </div>
+    @if (!(linkMarcado() == "crear-usuarios"
+   || linkMarcado() == "iniciar-sesion"
+   || linkMarcado() == "contrato-personal"
+   || linkMarcado() == "configuracion-personal"
+   || linkMarcado() == "plan-servicio-yuju"
+   || linkMarcado() != "recuperar-contraseña"
+   ))
+    {
+        <FooterLayout />
+    }
+
+
+</div>
+ 
+
+
+@code{
+
+    private bool collapseNavMenu = false;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "wrapper_container active" : "wrapper_container";
+    private string? NavMenuCssClassStyle => collapseNavMenu ? "height: 4290px;" : "height: auto;";
+ 
+    private string linkMarcado()
+    {     
+        return Navigator.ToBaseRelativePath(Navigator.Uri).ToString();
+    }
+
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+
+}

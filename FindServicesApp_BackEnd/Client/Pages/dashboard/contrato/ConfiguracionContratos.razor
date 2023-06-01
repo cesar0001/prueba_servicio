@@ -1,0 +1,163 @@
+﻿@page "/configuracion-personal"
+
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+@using System.Text.Json;
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization;
+
+<PageTitle>Find Services</PageTitle>
+
+
+
+@if (estaAutentificado == false)
+{
+    @*<ContenidoPrincipal />*@
+}
+else
+{
+
+    if (pasoPreguntaSeguridad == true)
+    {
+
+        <PreguntasDeSeguridad  MetodoGuardarPreguntas="@GuardarInformacionRespuesta" />
+    }
+    else
+    {
+        <ContratoPrincipalUsuarios usuario="@respuesta" data="@data" />
+
+    }
+}
+
+@if (preloader == true)
+{
+    <Preloader></Preloader>
+}
+
+
+
+@code{
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private bool estaAutentificado = false
+        , preloader = false,pasoPreguntaSeguridad = true;
+
+    UsuarioGeneralDto respuesta = new UsuarioGeneralDto();
+    string data;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationState;
+        var usuario = authState.User;
+
+
+        if (usuario.Identity.IsAuthenticated)
+        {
+
+            string customClaimValue = usuario.Claims.FirstOrDefault(c => c.Type == "data")?.Value;
+            data = customClaimValue;
+            try
+            {
+
+                await TenerInformacionUsuario(data);
+                estaAutentificado = true;
+
+            }
+            catch (Exception ex)
+            {
+                estaAutentificado = false;
+                // Manejar el error aqui podriamos cerrar sesion directamentes
+
+                //en caso de que de error
+
+                navigationManager.NavigateTo("logout");
+
+
+            }
+
+        }
+        else
+        {
+            estaAutentificado = false;
+
+        }
+
+
+    }
+
+    async Task TenerInformacionUsuario(string data)
+    {
+        try
+        {
+
+            var response = await Http.GetAsync($"api/usuarios/tenerUsuario/{data}");
+            response.EnsureSuccessStatusCode();
+
+            respuesta = await response.Content.ReadFromJsonAsync<UsuarioGeneralDto>();
+
+            if (respuesta.Pregunta_Contestadas == null)
+            {
+                pasoPreguntaSeguridad = true;
+            }
+            else
+            {
+                pasoPreguntaSeguridad = false;
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+
+            navigationManager.NavigateTo("logout");
+
+        }
+    }
+
+    private async Task GuardarInformacionRespuesta(PreguntasSeguridadDto value)
+    {
+
+
+        preloader = true;
+        value.idUsuario = respuesta.Id;
+
+        var response = await Http.PostAsJsonAsync("api/PreguntasSeguridad/guardar/pregunta", value);
+        if (response.IsSuccessStatusCode)
+        {
+
+
+            Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+            if (respuesta.res == "true")
+            {
+
+                await TenerInformacionUsuario(data);
+
+                preloader = false;
+
+
+            }
+
+            preloader = false;
+
+        }
+        else
+        {
+            if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+            {
+
+                preloader = false;
+                navigationManager.NavigateTo("logout");
+                //en teoria seria mandarlo al login por si se vence el token
+            }
+        }
+
+        await InvokeAsync(StateHasChanged);
+
+    }
+
+}

@@ -1,0 +1,834 @@
+﻿@*<div class="top-row ps-3 navbar navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="">FindServicesApp_BackEnd</a>
+            <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Home
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="counter">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Counter
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="fetchdata">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+                </NavLink>
+            </div>
+        </nav>
+    </div>*@
+
+
+@inject NavigationManager Navigator
+@using System.Security.Claims;
+@inject IJSRuntime JSRuntime
+@*<p>@Navigator.ToBaseRelativePath(Navigator.Uri)</p>*@
+
+@*<a id="advanced-menu-hide" @onclick="ToggleNavMenu"></a>*@
+
+<a id="advanced-menu-hide" href="#" @onclick="ToggleNavMenu"></a>
+
+<nav id="mobile-advanced" class="mobile-advanced">
+    <ul class="clearfix">
+        <li class="current-menu-item drop">
+            <NavLink @onclick="ToggleNavMenu" class="nav-link" href="" Match="NavLinkMatch.All">
+                Home
+            </NavLink>
+
+            <!--sub menu-->
+            @*<div class="sub_menu_wrap clearfix">
+                    <ul>
+
+                        <li class="current-menu-item">
+                            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                                Home
+                            </NavLink>
+                        </li>
+
+
+                    </ul>
+                </div>*@
+        </li>
+        <li class="drop">
+            <a href="#">Services</a>
+
+            <!--sub mega-menu-->
+            <div class="sub_menu_wrap mega_menu clearfix">
+                <div class="menu_col">
+                    <h6>Residential</h6>
+                    <ul>
+                        <li>
+                            <a href="#">Diagnosis & Checkup</a>
+                        </li>
+                        <li>
+                            <a href="#">Installation & Upgrades</a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                System Maintenance
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">Other Common Repairs</a>
+                        </li>
+                        <li>
+                            <a href="#">Clogged Drains</a>
+                        </li>
+                        <li><a href="#">Leaks</a></li>
+                        <li>
+                            <a href="#">Sewage Backups</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="menu_col">
+                    <h6>Commercial</h6>
+                    <ul>
+                        <li>
+                            <a href="#">Diagnosis & Checkup</a>
+                        </li>
+                        <li>
+                            <a href="#">Installations</a>
+                        </li>
+                        <li>
+                            <a href="#">System Maintenance</a>
+                        </li>
+                        <li>
+                            <a href="#">Clogged Drains</a>
+                        </li>
+                        <li>
+                            <a href="#">Plumbing Inspection</a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                HydroScrub® Drain
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+        <li class="drop">
+            <a href="#">Pages</a>
+            <!--sub menu-->
+            <div class="sub_menu_wrap clearfix">
+                <ul>
+                    <li>
+                        <a href="about_us.html">About</a>
+                    </li>
+                    <li>
+                        <a href="careers.html">Careers</a>
+                    </li>
+                    <li class="sub">
+                        <a href="#">Services</a>
+
+                        <!--sub menu-->
+                        <div class="sub_menu_wrap sub_menu_inner type_2 clearfix">
+                            <ul>
+                                <li>
+                                    <a href="services_v1.html">Services page1</a>
+                                </li>
+                                <li>
+                                    <a href="services_v2.html">Services page2</a>
+                                </li>
+                                <li>
+                                    <a href="services_detailed_v1.html">
+                                        Detailed service
+                                        page1
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="services_detailed_v2.html">
+                                        Detailed service
+                                        page2
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a href="team.html">Team</a></li>
+                    <li>
+                        <a href="clients.html">Clients</a>
+                    </li>
+                    <li>
+                        <a href="reviews.html">Reviews</a>
+                    </li>
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li>
+                        <a href="page_404.html">404 Page</a>
+                    </li>
+                    <li>
+                        <a href="pricing.html">Pricing</a>
+                    </li>
+                    <li>
+                        <a href="coming_soon.html">Coming Soon Page</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <li class="drop">
+            <a href="#">Gallery</a>
+
+            <!--sub menu-->
+            <div class="sub_menu_wrap clearfix">
+                <ul>
+                    <li>
+                        <a href="portfolio_masorny_sortable.html">Masonry (sortable)</a>
+                    </li>
+                    <li class="sub">
+                        <a href="#">Classic</a>
+
+                        <!--sub menu-->
+                        <div class="sub_menu_wrap sub_menu_inner type_2 clearfix">
+                            <ul>
+                                <li>
+                                    <a href="portfolio_1_col.html">1 column</a>
+                                </li>
+                                <li>
+                                    <a href="portfolio_2_col.html">2 columns</a>
+                                </li>
+                                <li>
+                                    <a href="portfolio_3_col.html">3 columns</a>
+                                </li>
+                                <li>
+                                    <a href="portfolio_3_col_sidebar.html">
+                                        3 columns width right
+                                        sidebar
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="portfolio_4_col_sortable.html">Sortable grid</a>
+                    </li>
+                    <li class="sub">
+                        <a href="#">Single project page</a>
+
+                        <!--sub menu-->
+                        <div class="sub_menu_wrap sub_menu_inner type_2 clearfix">
+                            <ul>
+                                <li>
+                                    <a href="project_detailed_page1.html">
+                                        Project detailed page
+                                        1
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="project_detailed_page2.html">
+                                        Project detailed page
+                                        2
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="project_detailed_page3.html">
+                                        Project detailed page
+                                        3
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <li class="drop">
+            <a href="#">Features</a>
+
+            <!--sub menu-->
+            <div class="sub_menu_wrap clearfix">
+                <ul>
+                    <li>
+                        <a href="elements.html">Elements</a>
+                    </li>
+                    <li>
+                        <a href="typography.html">
+                            Typography
+                        </a>
+                    </li>
+                    <li>
+                        <a href="columns.html">Columns</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+
+        <li class="drop">
+            <a href="#">Contact</a>
+
+            <!--sub menu-->
+            <div class="sub_menu_wrap clearfix">
+                <ul>
+                    <li>
+                        <a href="contact_v1.html">Contact page 1</a>
+                    </li>
+                    <li>
+                        <a href="contact_v2.html">Contact page 2</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <AuthorizeView>
+            <Authorized>
+
+                <li class="drop">
+                    <a href="#">@context.User.Claims.FirstOrDefault(c => c.Type == "correo")?.Value</a>
+
+                    <!--sub menu-->
+                    <div class="sub_menu_wrap clearfix">
+                        <ul>
+                            <li>
+
+                                <a @onclick="ToggleNavMenu" href="configuracion-personal">Perfil</a>
+
+                            </li>
+                            <li>
+
+                                <a @onclick="ToggleNavMenu" href="logout">Salir</a>
+
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
+            </Authorized>
+            <NotAuthorized>
+                <li class=" drop">
+                    <a href="#">Iniciar sesión</a>
+
+                    <!--sub menu-->
+                    <div class="sub_menu_wrap clearfix">
+                        <ul>
+                            <li @onclick="abrir">
+
+                                @*<NavLink @onclick="ToggleNavMenu" href="iniciar-sesion">
+                                        Iniciar sesión
+                                    </NavLink>*@
+                                <a @onclick="ToggleNavMenu" >Iniciar sesión</a>
+
+                            </li>
+
+
+
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="  drop">
+                    <a href="#">Registrarse</a>
+
+                    <!--sub menu-->
+                    <div class="sub_menu_wrap clearfix">
+                        <ul>
+                            <li  @onclick="abrirRegistro">
+
+                                <a @onclick="ToggleNavMenu" >Registrarse</a>
+
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
+            </NotAuthorized>
+
+        </AuthorizeView>
+
+
+
+    </ul>
+</nav>
+
+<header id="header" class="header header-5">
+    <div class="container" style="width: 100%;">
+        <!-- top-header -->
+        <div class="header_top">
+            <div class="row">
+                <div class="col-md-3">
+                    <a href="index.html" class="logo">
+                        <img src="images/logo5.png" alt="" />
+                    </a>
+                </div>
+                <div class="col-md-9">
+                    <div class="header_contact_list">
+                        <ul>
+                            <li>
+                                <p class="icon_loc">
+                                    Brooklyn, NY 10036, United States
+                                </p>
+                            </li>
+                            <li><p class="icon_phone">1-800-123-1234</p></li>
+                            <li>
+                                <p class="icon_mail">
+                                    <a href="#">contact@contractorsupport.com</a>
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--main menu-->
+    <div class="menu_holder">
+        <div class="menu_wrap">
+            <div class="container">
+                <div class="bottom_header relative">
+                    <!-- - - - - - - - - - - - - - Navigation - - - - - - - - - - - - - - - - -->
+
+                    <div class="nav_item">
+                        <button id="responsive-nav-button"
+                                class="responsive-nav-button"
+                                @onclick="ToggleNavMenu"></button>
+
+                        <nav class="main_navigation">
+                            <ul class="clearfix">
+                                <li class="@linkMarcado("home") drop">
+                                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                                        Home
+                                    </NavLink>
+
+                                    <!--sub menu-->
+                                    @*<div class="sub_menu_wrap clearfix">
+                                            <ul>
+                                                <li>
+                                                    <a href="../counter">counter</a>
+                                                </li>
+                                                <li>
+                                                    <a href="../main2/index.html">Demo 2</a>
+                                                </li>
+                                                <li>
+                                                    <a href="../main3/index.html">Demo 3</a>
+                                                </li>
+                                                <li>
+                                                    <a href="../main4/index.html">Demo 4</a>
+                                                </li>
+                                                <li class="current-menu-item">
+                                                    <a href="../main5/index.html">Demo 5</a>
+                                                </li>
+                                                <li>
+                                                    <a href="../main6/index.html">Demo 6</a>
+                                                </li>
+                                            </ul>
+                                        </div>*@
+                                </li>
+                                <li class="drop">
+                                    <a href="#">Services</a>
+
+                                    <!--sub mega-menu-->
+                                    <div class="sub_menu_wrap mega_menu clearfix">
+                                        <div class="menu_col">
+                                            <h6>Residential</h6>
+                                            <ul>
+                                                <li>
+                                                    <a href="#">Diagnosis & Checkup</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Installation & Upgrades</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">
+                                                        System Maintenance
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Other Common Repairs</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Clogged Drains</a>
+                                                </li>
+                                                <li><a href="#">Leaks</a></li>
+                                                <li>
+                                                    <a href="#">Sewage Backups</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="menu_col">
+                                            <h6>Commercial</h6>
+                                            <ul>
+                                                <li>
+                                                    <a href="#">Diagnosis & Checkup</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Installations</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">System Maintenance</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Clogged Drains</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Plumbing Inspection</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">
+                                                        HydroScrub® Drain
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="drop">
+                                    <a href="#">Pages</a>
+                                    <!--sub menu-->
+                                    <div class="sub_menu_wrap clearfix">
+                                        <ul>
+                                            <li>
+                                                <a href="about_us.html">About</a>
+                                            </li>
+                                            <li>
+                                                <a href="careers.html">Careers</a>
+                                            </li>
+                                            <li class="sub">
+                                                <a href="#">Services</a>
+
+                                                <!--sub menu-->
+                                                <div class="sub_menu_wrap sub_menu_inner type_2 clearfix">
+                                                    <ul>
+                                                        <li>
+                                                            <a href="services_v1.html">Services page1</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="services_v2.html">Services page2</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="services_detailed_v1.html">
+                                                                Detailed service
+                                                                page1
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="services_detailed_v2.html">
+                                                                Detailed service
+                                                                page2
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                            <li><a href="team.html">Team</a></li>
+                                            <li>
+                                                <a href="clients.html">Clients</a>
+                                            </li>
+                                            <li>
+                                                <a href="reviews.html">Reviews</a>
+                                            </li>
+                                            <li><a href="faq.html">FAQ</a></li>
+                                            <li>
+                                                <a href="page_404.html">404 Page</a>
+                                            </li>
+                                            <li>
+                                                <a href="pricing.html">Pricing</a>
+                                            </li>
+                                            <li>
+                                                <a href="coming_soon.html">Coming Soon Page</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="drop">
+                                    <a href="#">Gallery</a>
+
+                                    <!--sub menu-->
+                                    <div class="sub_menu_wrap clearfix">
+                                        <ul>
+                                            <li>
+                                                <a href="portfolio_masorny_sortable.html">Masonry (sortable)</a>
+                                            </li>
+                                            <li class="sub">
+                                                <a href="#">Classic</a>
+
+                                                <!--sub menu-->
+                                                <div class="sub_menu_wrap sub_menu_inner type_2 clearfix">
+                                                    <ul>
+                                                        <li>
+                                                            <a href="portfolio_1_col.html">1 column</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="portfolio_2_col.html">2 columns</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="portfolio_3_col.html">3 columns</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="portfolio_3_col_sidebar.html">
+                                                                3 columns width right
+                                                                sidebar
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <a href="portfolio_4_col_sortable.html">Sortable grid</a>
+                                            </li>
+                                            <li class="sub">
+                                                <a href="#">Single project page</a>
+
+                                                <!--sub menu-->
+                                                <div class="sub_menu_wrap sub_menu_inner type_2 clearfix">
+                                                    <ul>
+                                                        <li>
+                                                            <a href="project_detailed_page1.html">
+                                                                Project detailed page
+                                                                1
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="project_detailed_page2.html">
+                                                                Project detailed page
+                                                                2
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="project_detailed_page3.html">
+                                                                Project detailed page
+                                                                3
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="drop">
+                                    <a href="#">Features</a>
+
+                                    <!--sub menu-->
+                                    <div class="sub_menu_wrap clearfix">
+                                        <ul>
+                                            <li>
+                                                <a href="elements.html">Elements</a>
+                                            </li>
+                                            <li>
+                                                <a href="typography.html">
+                                                    Typography
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="columns.html">Columns</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+
+                                <li class="drop">
+                                    <a href="#">Contact</a>
+
+                                    <!--sub menu-->
+                                    <div class="sub_menu_wrap clearfix">
+                                        <ul>
+                                            <li>
+                                                <a href="contact_v1.html">Contact page 1</a>
+                                            </li>
+                                            <li>
+                                                <a href="contact_v2.html">Contact page 2</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+
+
+                                <AuthorizeView>
+                                    <Authorized>
+
+                                        <li class="drop">
+                                            <a href="#">@context.User.Claims.FirstOrDefault(c => c.Type == "correo")?.Value</a>
+
+                                            <!--sub menu-->
+                                            <div class="sub_menu_wrap clearfix">
+                                                <ul>
+
+                                                    <li>
+
+                                                        <a href="configuracion-personal">Perfil</a>
+
+                                                    </li>
+                                                    <li>
+
+                                                        <a href="logout">Salir</a>
+
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    </Authorized>
+                                    <NotAuthorized>
+                                        <li class=" drop">
+                                            <a href="#">Iniciar sesión</a>
+
+                                            <!--sub menu-->
+                                            <div class="sub_menu_wrap clearfix">
+                                                <ul>
+                                                    <li @onclick="abrir">
+                                                        <a>Iniciar sesión</a>
+                                                    </li>
+
+
+
+                                                </ul>
+                                            </div>
+                                        </li>
+
+                                        <li class="drop">
+                                            <a href="#">Registrarse</a>
+
+                                            <!--sub menu-->
+                                            <div class="sub_menu_wrap clearfix">
+                                                <ul>
+                                                    <li>
+                                                        <a @onclick="abrirRegistro">Registrarse</a>
+                                                        @*<NavLink @onclick="ToggleNavMenu" href="crear-usuarios">
+                                                                Registrarse
+                                                            </NavLink>*@
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                        </li>
+
+                                    </NotAuthorized>
+
+                                </AuthorizeView>
+
+
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <!-- - - - - - - - - - - - - end Navigation - - - - - - - - - - - - - - - -->
+                    @*<div class="search-holder">
+                            <div class="search_box">
+                                <div class="serch_button_wrap">
+                                    <button class="search_button"></button>
+                                </div>
+                            </div>
+                        </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+@if (AbrirModal == "false")
+{
+    <ModalLoginUsuario 
+                       abrirRegistro="@(() => abrirRegistroDesdeLogin())"
+                       Estilo="@estilo" 
+                       cerrarVentana="@(() => cerrarModal())"></ModalLoginUsuario>
+}
+
+@if (AbrirModalRegistro == "false")
+{
+    <ModalAñadirUsuarios Estilo="@estilo_registro" cerrarVentana="@(() => cerrarModalRegistro())"></ModalAñadirUsuarios>
+}
+
+
+@code {
+
+
+    [Parameter] public EventCallback ToggleNavMenu { get; set; }
+
+    private string AbrirModal = "true", AbrirModalRegistro = "true";
+    private string estilo = "",estilo_registro="";
+
+    private string home = "", registro = "";
+
+    private async Task cerrarModal()
+    {
+        await module.InvokeVoidAsync("cambiarOverflowActivo");
+        AbrirModal = "true";
+        estilo = "display: none;";
+
+    }
+
+    private async Task abrirRegistroDesdeLogin()
+    {
+        await abrirRegistro();
+        await cerrarModal();
+    }
+
+    private async Task abrir()
+    {
+        await module.InvokeVoidAsync("cambiarOverflow");
+        AbrirModal = "false";
+        estilo = "";
+    }
+
+    private async Task cerrarModalRegistro()
+    {
+        await module.InvokeVoidAsync("cambiarOverflowActivo");
+        AbrirModalRegistro = "true";
+        estilo_registro = "display: none;";
+
+    }
+
+
+    private async Task abrirRegistro()
+    {
+        await module.InvokeVoidAsync("cambiarOverflow");
+        AbrirModalRegistro = "false";
+        estilo_registro = "";
+    }
+
+    IJSObjectReference module;
+
+    protected override async Task OnInitializedAsync()
+    {
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+
+    }
+
+
+    private string linkMarcado(string linkiado)
+    {
+
+        if (linkiado == "home")
+        {
+            return home = Navigator.ToBaseRelativePath(Navigator.Uri).ToString().Trim() == "" ? "current-menu-item" : "";
+
+        }
+
+        if (linkiado == "registro")
+        {
+            return registro = Navigator.ToBaseRelativePath(Navigator.Uri).ToString() == "crear-usuarios" ? "current-menu-item" : "";
+        }
+
+        if (linkiado == "login")
+        {
+
+            return registro = Navigator.ToBaseRelativePath(Navigator.Uri).ToString() == "iniciar-sesion" ? "current-menu-item" : "";
+        }
+
+        return "";
+
+        //return Navigator.ToBaseRelativePath(Navigator.Uri).ToString();
+    }
+
+    //private bool collapseNavMenu = false;
+
+    //private string? NavMenuCssClass => collapseNavMenu ? "wrapper_container active" : "wrapper_container";
+
+    //private void ToggleNavMenu()
+    //{
+    //    collapseNavMenu = !collapseNavMenu;
+    //}
+}

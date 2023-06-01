@@ -1,0 +1,906 @@
+﻿<PageTitle>Find Services</PageTitle>
+
+@using System.Text.Json;
+@inject IJSRuntime JSRuntime
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Text.RegularExpressions
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+
+
+@using System.IO
+@*#f4bc16 color de fondo*@
+
+@*fa fa-check*@
+
+@*se esta trabajando con este*@
+@*https://bootdey.com/snippets/view/user-profile-bio-graph-and-total-sales#html*@
+
+@*usar el title en las opciones title="Tiene Pendientes" cuando seleccina la opcion*@
+
+<div class="container bootstrap snippets bootdey">
+    <div class="row">
+        @* header *@
+        <div class="col-md-3 profile-nav">
+            <div style="background: white; max-width: 100%; width: 100%; -webkit-box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); -moz-box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); ">
+                @*<h2>Contact Us</h2>*@
+                <div class="panel">
+                    <div class="user-heading round">
+                        <span style=" font-weight: bold; ">Informacion Personal</span>
+                        <br /><br />
+
+                        @if (usuario.DatosGeneralesFinal == null)
+                        {
+
+                            <a>
+                                <img src="images/foto_sinpersona.jpeg" alt="imagen personal">
+                            </a>
+                        }
+                        else
+                        {
+
+
+                            @if (string.IsNullOrEmpty(usuario.DatosGeneralesFinal.foto_perfil) == false)
+                            {
+                                <a>
+                                    <img src="@usuario.DatosGeneralesFinal.foto_perfil" alt="imagen personal">
+                                </a>
+                            }
+
+                            else
+                            {
+                                <a>
+                                    <img src="images/foto_sinpersona.jpeg" alt="imagen personal">
+                                </a>
+                            }
+
+                        }
+
+
+
+
+                        <br />
+                        <span style=" font-weight: bold; ">Correo:  </span>
+                        <span class="quita_margin">@usuario.Email</span>
+                        <br />
+                        @if (usuario.DatosGenerales != null)
+                        {
+
+                            <span style=" font-weight: bold; ">Nombre:  </span>
+                            <span class="quita_margin">@usuario.DatosGenerales.Nombre @usuario.DatosGenerales.Apellido</span>
+                            <br />
+                            <span style=" font-weight: bold; ">Identidad:  </span>
+                            <span class="quita_margin">@usuario.DatosGenerales.Identidad</span>
+                            <br />
+                            <span style=" font-weight: bold; ">Genero:  </span>
+                            <span class="quita_margin">@usuario.DatosGenerales.Genero</span>
+                            <br />
+                            <span style=" font-weight: bold; ">Fecha Nac.  </span>
+                            <span class="quita_margin">@usuario.DatosGenerales.Fecha_nacimiento.ToString("dd-MM-yyy")</span>
+                            <br />
+                            <span style=" font-weight: bold; ">Profesión:  </span>
+                            <span class="quita_margin">@usuario.DatosGenerales.Profesion.NombreProfesion</span>
+                            <br />
+                            <span style=" font-weight: bold; ">Departamento:  </span>
+                            <span class="quita_margin">@usuario.DatosGenerales.departamentos.Nombre</span>
+                            <br />
+                            <span style=" font-weight: bold; ">Municipio:  </span>
+                            <span class="quita_margin">@usuario.DatosGenerales.Estado.Nombre</span>
+                        }
+
+                        @if (usuario.DatosGeneralesFinal != null)
+                        {
+                            <br />
+                            <a href="@usuario.DatosGeneralesFinal.foto_identidad_adelantera" target="_blank" style="font-weight: 600; text-decoration: none; color: white; margin-top: 12px;border:none;" class="quita_margin">
+                                Ver la parte frontal de tu identidad
+                            </a>
+                            <br />
+                            <a href="@usuario.DatosGeneralesFinal.foto_identidad_trasera" target="_blank" style="font-weight: 600; text-decoration: none; color: white; margin-top: 12px; border: none; " class="quita_margin">
+                                Ver la parte trasera de tu identidad
+                            </a>
+                        }
+
+                    </div>
+
+                    <ul class="nav nav-pills nav-stacked">
+
+                        @*@if (usuario.DatosGenerales == null)*@
+                        @if (usuario.Contrato_aprobado == false)
+                        {
+
+                            <li class="@(pantalla=="Datos Generales"?"active":"")">
+                                <a style="color: #89817f;" @onclick="@(() => cambioPantalla("Datos Generales"))">
+                                    General
+                                    @if (usuario.DatosGenerales == null || usuario.DatosGeneralesFinal == null)
+                                    {
+                                        <span class="label label-warning pull-right r-activity">Paso 1</span>
+                                    }
+
+                                </a>
+                            </li>
+                        }
+                        @if (usuario.Contrato_aprobado == false)
+                        {
+                            @if (usuario.firma == null)
+                            {
+                                @if (existeDatos == false && existeFirma == false)
+                                {
+                                    <li><a style="color: #89817f;"> Firma </a></li>
+
+                                }
+                                else
+                                {
+                                    <li class="@(pantalla=="Firma"?"active":"")">
+                                        <a style="color: #89817f;" @onclick="@(() => cambioPantalla("Firma"))">
+                                            Firma
+                                            <span class="label label-warning pull-right r-activity">Paso 2</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="@(pantalla=="Firma"?"active":"")"><a style="color: #89817f;" @onclick="@(() => cambioPantalla("Firma"))"> Firma  </a></li>
+
+                            }
+                        }
+
+
+
+
+
+                        @if (existeDatos == true && existeFirma == true)
+                        {
+
+                            <li class="@(pantalla=="Contrato"?"active":"")"><a style="color: #89817f;" @onclick="@(() => cambioPantalla("Contrato"))">
+                            Contrato
+                            @if (usuario.contrato_firmado != true)
+                            {
+                                <span class="label label-warning pull-right r-activity">Paso 3</span>
+
+                            }
+                                </a>
+                            </li>
+
+                        }
+                        else
+                        {
+                            <li><a style="color: #89817f;"> Contrato  </a></li>
+
+                        }
+
+                        @if (usuario.contrato_firmado == true)
+                        {
+
+
+                            <li @onclick="moverAplan" ><a style="color: #89817f;"> Plan de Servicios <span class="label label-warning pull-right r-activity">Paso 4</span> </a></li>
+
+                        }
+                        else
+                        {
+                            <li  ><a style="color: #89817f;"> Plan de Servicios   </a></li>
+
+                        }
+
+                        @if (existeDatos == true)
+                        {
+                            <li class="@(pantalla=="Usuario"?"active":"")"><a style="color: #89817f !important" @onclick="@(() => cambioPantalla("Usuario"))"> @*<i class="fa fa-edit"></i>*@ Usuario <i class="fa fa-gear"></i> @*<span class="label label-warning pull-right r-activity">9</span>*@</a></li>
+
+                        }
+                        else
+                        {
+                            <li class="@(pantalla=="Usuario"?"active":"")"><a style="color: #89817f !important"> Usuario <i class="fa fa-gear"></i>  @*<span class="label label-warning pull-right r-activity">9</span>*@</a></li>
+                        }
+
+                        <li class="@(pantalla=="Ayuda"?"active":"")"><a style="color: #89817f !important" @onclick="@(() => cambioPantalla("Ayuda"))"> @*<i class="fa fa-edit"></i>*@ Ayuda <i class="fa fa-info-circle"></i> @*<span class="label label-warning pull-right r-activity">9</span>*@</a></li>
+
+
+                        @*<li><a > <i class="fa fa-edit"></i> Edit profile</a></li>*@
+                    </ul>
+                </div>
+            </div>
+
+
+        </div>
+        @* contenido
+        *@
+        <div class="@((usuario.DatosGenerales != null && pantalla == "Datos Generales" && siguienteFormularioGeneral==false)? "col-md-9":"col-md-7" ) profile-info">
+
+            <div style="background: white;  max-width: 1550px; -webkit-box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); -moz-box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); ">
+
+                <div class="bio-graph-heading">
+                    @pantalla
+                </div>
+
+                <div class="row">
+
+
+                    <div class="col-sm-12">
+
+                        @if (pantalla == "Datos Generales")
+                        {
+
+                            if (siguienteFormularioGeneral == false)
+                            {
+                                <DatosGeneralesUsuarios MetodoGuardar="@InsertarDatosGenerales"
+                                                        Profesion="@Profesion"
+                                                        CambiarDepartamentos="@ValorDeptoCambiado"
+                                                        Departamentos="@Departamentos"
+                                                        Municipio="@Municipio"
+                                                        data="@data">
+                                </DatosGeneralesUsuarios>
+
+                            }
+                            else
+                            {
+
+                                <DatosGeneralesUsuarioNext data="@data"
+                                                           Atras="@retrocederFormularioSiguiente"></DatosGeneralesUsuarioNext>
+
+                                //                                MetodoGuardarDatos="GuardarDatosGeneralesParteFinal"
+
+                            }
+
+
+
+
+
+
+                        }
+                        else
+                        {
+                            @if (pantalla == "Firma")
+                            {
+
+                                @*<FirmaUsuarios usuario="@usuario"/>*@
+
+                                <div class="container" style="background: white; max-width: 100%; width:100%; ">
+
+                                    <div class="row">
+
+                                        <div class="col-sm-12">
+                                            <br />
+
+                                            <form @onsubmit="OnSubmit">
+                                                <label class="control-label cambio_color"><strong>Foto</strong> Tipos Permitidos: PNG,JPG, JPEG.</label>
+                                                <div class="file-input-container">
+                                                    <InputFile accept="image/png,image/jpeg,image/jpg,image/tiff" OnChange="OnInputFileChange" />
+                                                </div>
+
+                                                <p>
+                                                    La foto debe de pesar menos de 8 MB
+                                                </p>
+                                                @if (imagenRequerida != null)
+                                                {
+                                                    <p style="color:red;margin-top: -10px;">@imagenRequerida</p>
+                                                }
+
+                                                <br />
+                                                <p>
+                                                    <strong>Si su firma no tiene un fondo blanco o transperente se le sugiere, cambiarle el fondo a blanco aqui puede pasar su foto a transparente:</strong>
+                                                    <a target="_blank" href="https://transparent.imageonline.co/es/">
+                                                        <label style="color: #015AAA; cursor: pointer; ">transparent.imageonline.co/</label>
+                                                    </a>
+                                                </p>
+
+                                                <div class="align_center" style="padding-top:10px">
+                                                    <!--!-->
+
+                                                    @if (imageUrl == null)
+                                                    {
+
+
+                                                        <img class="align_center" width="160px" height="160px"
+                                                             style="width: 160px; height: 160px; padding-top: 10px"
+                                                             src="images/artempty.jpeg" alt="Firma" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <img class="align_center" width="160px" height="160px"
+                                                             style="width: 160px; height: 160px; padding-top: 10px"
+                                                             src="@imageUrl" alt="Foto de Perfil" />
+                                                    }
+
+
+                                                    <!--!-->
+                                                </div>
+
+
+
+                                                <div class="align_center" style="padding-top:10px">
+
+                                                    <button type="submit" class="button type1">
+                                                        <span><span style="padding-top:10px; color:white">Guardar Firma</span><span style="padding-top:10px">Guardar Firma</span></span>
+                                                    </button>
+
+
+
+                                                </div>
+
+                                                <br />
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                //fin de pantalla firma
+                            }
+                            else
+                            {
+                                @if (pantalla == "Contrato")
+                                {
+
+                                    <div class="container" style="background: white; max-width: 100%; width: 100%; ">
+
+                                        <div class="row">
+
+                                            <div class="col-sm-12">
+                                                <br />
+
+
+                                                <div class="align_center" style="padding-top:10px">
+
+
+                                                    <button @onclick="contrato" type="submit" class="button type1" style="width:165px">
+                                                        <span><span style="padding-top:10px; color:white">Generar Contrato</span><span style="padding-top:10px">Generar Contrato</span></span>
+                                                    </button>
+                                                    <p>
+                                                        Leer contrato y firmarlo
+                                                    </p>
+
+
+
+                                                </div>
+
+                                                <br />
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                                else
+                                {
+                                    @if (pantalla == "Ayuda")
+                                    {
+                                        <AyudaContrato></AyudaContrato>
+                                    }
+                                    else
+                                    {
+                                        <ConfiguracionUsuario Data="@usuario"></ConfiguracionUsuario>
+
+                                    }
+
+                                }
+                            }
+
+
+                        }
+
+
+
+
+                    </div>
+
+
+
+
+
+                </div>
+            </div>
+
+
+        </div>
+
+        @if (usuario.DatosGenerales != null && pantalla == "Datos Generales" && siguienteFormularioGeneral == false)
+        {
+
+        }
+        else
+        {
+            <div class="col-md-2 profile-info">
+                <div style="background: white; max-width: 170px; width:100%; -webkit-box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); -moz-box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); box-shadow: 0px 0px 8px 0px rgba(194,194,194,1); ">
+                    <div class="bio-graph-heading" style="text-align: start; padding-left: 20px">
+                        Requisitos
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div style="padding-left: 20px; margin-bottom: 1.25rem; margin-top: 1.25rem">
+                                <a style="@estiloDatos">
+                                    General <i style="@estiloDatos" class="@iconoDatos"></i>
+                                </a>
+                            </div>
+                            <div style="padding-left: 20px; margin-bottom: 1.25rem ">
+                                <a style="@estiloDatos">
+                                    Referencias <i style="@estiloDatos" class="@iconoDatos"></i>
+                                </a>
+                            </div>
+
+                            <div style="padding-left: 20px; margin-bottom: 1.25rem ">
+                                <a style="@estiloFirma"> Firma <i style="@estiloFirma" class="@iconoFirma"></i>  </a>
+                            </div>
+
+                            <div style="padding-left: 20px; margin-bottom: 1.25rem ">
+                                <a style="@estiloContrato"> Contrato <i style="@estiloContrato" class="@iconoContrato"></i>  </a>
+                            </div>
+
+                            <div style="padding-left: 20px; margin-bottom: 1.25rem ">
+                                <a style="color:red"> Plan de Servicios <i style="color:red" class="fa fa-edit"></i> </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+
+    </div>
+</div>
+
+<br />
+<br />
+
+@if (preloader == true)
+{
+    <Preloader></Preloader>
+}
+
+@if (AbrirModal == true)
+{
+    <MensajeModal Estilo="@estilo" Titulo="@titulo" Cuerpo="@mensaje" cerrarVentana="@(() => cerrarModal())"></MensajeModal>
+}
+
+
+@code{
+
+
+    //los parametros que va a tener el componente
+    [Parameter] public UsuarioGeneralDto usuario { get; set; }
+    [Parameter] public string data { get; set; }
+
+    private string titulo = "Plan de Servicio", mensaje = "El administrador debe de aceptar el contrato para que usted pueda elejir el plan de servicio", estilo = "";
+
+    //variable para tomar los datos
+    DatosGeneralesDto datos = new DatosGeneralesDto();
+    List<Departamentos> Departamentos = new List<Departamentos>();
+    List<Municipio> Municipio = new List<Municipio>();
+    List<Profesion> Profesion = new List<Profesion>();
+
+    private string imageUrl = null;
+
+
+    //variables para cambiar pantalla y estilos
+    private string pantalla = "Datos Generales";
+
+    private bool existeDatos = false,
+        existeFirma = false,
+        preloader = false,
+        AbrirModal = false,
+        siguienteFormularioGeneral = false;
+
+    private string estiloDatos = "color:red;text-decoration:none;", estiloFirma = "color:red; text-decoration:none", estiloContrato = "color:red; text-decoration:none";
+    private string iconoDatos = "fa fa-edit", iconoFirma = "fa fa-edit", iconoContrato = "fa fa-edit";
+
+    private void cambioPantalla(string data)
+    {
+        pantalla = data;
+    }
+
+    private void aprobarContrato()
+    {
+        AbrirModal = true;
+    }
+
+    private void moverAplan()
+    {
+        navigationManager.NavigateTo("plan-servicio");
+    }
+
+    private void cerrarModal()
+    {
+        AbrirModal = !AbrirModal;
+        estilo = AbrirModal == true ? "display: none;" : "";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        //inicializa datos con el id y fecha
+        //datos.RegistroUsuarioId = usuario.Id;
+        firma.idUsuario = usuario.Id;
+
+        if(usuario.firma != null)
+        {
+            imageUrl = usuario.firma.Firma;
+        }
+
+        //if (usuario.DatosGenerales != null)
+        //{
+        //    datos.Nombre = usuario.DatosGenerales.Nombre;
+        //    datos.Apellido = usuario.DatosGenerales.Apellido;
+        //    datos.Profesion = usuario.DatosGenerales.Profesion;
+        //    datos.Identidad = usuario.DatosGenerales.Identidad;
+        //    datos.Genero = usuario.DatosGenerales.Genero;
+        //    datos.Opinion_Personal = usuario.DatosGenerales.Opinion_Personal;
+        //    datos.Fecha_nacimiento = usuario.DatosGenerales.Fecha_nacimiento;
+        //    datos.DepartamentoId = usuario.DatosGenerales.DepartamentoId;
+        //    datos.MunicipioId = usuario.DatosGenerales.MunicipioId;
+        //    datos.id_profesion = usuario.DatosGenerales.id_profesion;
+        //    await ValorDeptoCambiado(datos.DepartamentoId);
+
+        //}
+        //else
+        //{
+        //    datos.Fecha_nacimiento = DateTime.Now;
+
+        //}
+
+        try
+        {
+
+            var response = await Http.GetAsync("api/Deptos/tener/deptos");
+            response.EnsureSuccessStatusCode();
+
+            Departamentos = await response.Content.ReadFromJsonAsync<List<Departamentos>>();
+            //--------------profesionales
+
+            var pro = await Http.GetAsync("api/Profesiones/tener/profesiones");
+            pro.EnsureSuccessStatusCode();
+
+            Profesion = await pro.Content.ReadFromJsonAsync<List<Profesion>>();
+
+
+        }
+        catch (Exception ex)
+        {
+            navigationManager.NavigateTo("logout");
+        }
+
+
+        metodoCambiarEstilo();
+    }
+
+    private async Task InsertarDatosGenerales(DatosGeneralesDto newDatos)
+    {
+        await InvokeAsync(StateHasChanged);
+
+        newDatos.RegistroUsuarioId = usuario.Id;
+        datos = newDatos;
+        //Console.WriteLine("componente contratoPrincipal: " + newDatos.id_profesion);
+        //Console.WriteLine("componente contratoPrincipal: "+ newDatos.sacar_id_profesional);
+
+        preloader = true;
+        var response = await Http.PostAsJsonAsync("api/usuarios/crearDatosGenerales", newDatos);
+        if (response.IsSuccessStatusCode)
+        {
+            Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+            if (respuesta.res == "true")
+            {
+
+                try
+                {
+
+                    var response_data = await Http.GetAsync($"api/usuarios/tenerUsuario/{data}");
+                    response_data.EnsureSuccessStatusCode();
+
+                    usuario = await response_data.Content.ReadFromJsonAsync<UsuarioGeneralDto>();
+
+                    preloader = false;
+                    siguienteFormularioGeneral = true;
+                    //metodoCambiarEstilo();
+                    //pantalla = "Firma";
+
+
+                }
+                catch (Exception ex)
+                {
+                    preloader = false;
+                    navigationManager.NavigateTo("logout");
+
+
+                }
+
+                //salida del if de comparar si es true
+
+            }
+            else
+            {
+                preloader = false;
+            }
+        }
+        else
+        {
+            if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+            {
+                preloader = false;
+                navigationManager.NavigateTo("logout");
+            }
+
+        }
+    }
+
+
+    private void retrocederFormularioSiguiente()
+    {
+
+        siguienteFormularioGeneral = false;
+    }
+
+
+    //permite cambiar estilo
+    private void metodoCambiarEstilo()
+    {
+
+
+        if (usuario.firma == null)
+        {
+            existeFirma = false;
+            //pantalla = "Datos Generales";
+            estiloFirma = "color:red; cursor: pointer; text-decoration:none;";
+            iconoFirma = "fa fa-edit";
+            pantalla = "Firma";
+        }
+        else
+        {
+            existeFirma = true;
+            estiloFirma = "color:#89817f ; cursor: pointer; text-decoration:none;";
+            iconoFirma = "fa fa-check";
+            pantalla = "Contrato";
+
+        }
+
+        if (usuario.DatosGenerales == null)
+        {
+            existeDatos = false;
+            //pantalla = "Datos Generales";
+            estiloDatos = "color:red; cursor: pointer;text-decoration:none;";
+            iconoDatos = "fa fa-edit";
+
+            pantalla = "Datos Generales";
+        }
+        else
+        {
+            if(usuario.DatosGeneralesFinal == null || usuario.cantidad_experiencia_lab ==0
+                || usuario.cantidad_educacion == 0)
+            {
+                //existeDatos = true;
+                estiloDatos = "color:red ; cursor: pointer;text-decoration:none;";
+                iconoDatos = "fa fa-edit";
+
+                siguienteFormularioGeneral = true;
+                pantalla = "Datos Generales";
+            }
+            else
+            {
+                existeDatos = true;
+                estiloDatos = "color:#89817f ; cursor: pointer; text-decoration:none;";
+                iconoDatos = "fa fa-check";
+
+                siguienteFormularioGeneral = true;
+                pantalla = "Firma";
+            }
+
+        }
+
+        if (existeDatos == true && existeFirma == true)
+        {
+
+
+            if (usuario.contrato_firmado == false)
+            {
+                estiloContrato = "color:red; cursor: pointer; text-decoration:none;";
+                iconoContrato = "fa fa-edit";
+                pantalla = "Contrato";
+            }
+            else
+            {
+                estiloContrato = "color:#89817f ; cursor: pointer; text-decoration:none;";
+                iconoContrato = "fa fa-check";
+                pantalla = "Usuario";
+            }
+
+
+        }
+        else
+        {
+            if (usuario.contrato_firmado == false)
+            {
+                estiloContrato = "color:red; cursor: pointer; text-decoration:none;";
+                iconoContrato = "fa fa-edit";
+                //pantalla = "Contrato";
+            }
+            else
+            {
+                estiloContrato = "color:#89817f ; cursor: pointer; text-decoration:none;";
+                iconoContrato = "fa fa-check";
+                pantalla = "Usuario";
+            }
+
+
+        }
+
+    }
+
+    private async Task ValorDeptoCambiado(int value)
+    {
+        //Console.WriteLine(value);
+        await InvokeAsync(StateHasChanged);
+        if (value == 0)
+        {
+            Municipio.Clear();
+        }
+        else
+        {
+            await CargarMunicipio(value);
+        }
+    }
+
+    private async Task CargarMunicipio(int deptoId)
+    {
+        try
+        {
+
+            var response = await Http.GetAsync($"api/Deptos/municipios/{deptoId}");
+            response.EnsureSuccessStatusCode();
+
+            Municipio = await response.Content.ReadFromJsonAsync<List<Municipio>>();
+            //Municipio = await Http.GetFromJsonAsync<List<Municipio>>($"api/Deptos/municipios/{deptoId}");
+
+
+        }
+        catch (Exception ex)
+        {
+            navigationManager.NavigateTo("logout");
+        }
+    }
+
+    //------------------------FIRMAS------------------------------
+
+    FirmaCreateOrEditDto firma = new FirmaCreateOrEditDto();
+
+
+    private string imagenRequerida = null;
+
+    IReadOnlyList<IBrowserFile> selectedFiles;
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFiles = e.GetMultipleFiles();
+
+
+        var file = e.File;
+        if (file != null)
+        {
+            if (file.Size > 0 && file.Size < 8000000)
+            {
+                var buffer = new byte[file.Size];
+                await file.OpenReadStream(maxAllowedSize: 8000000).ReadAsync(buffer);
+                var base64 = Convert.ToBase64String(buffer);
+                imageUrl = $"data:{file.ContentType};base64,{base64}";
+            }
+
+
+        }
+        else
+        {
+            imageUrl = null;
+        }
+
+        this.StateHasChanged();
+    }
+
+    private async Task OnSubmit()
+    {
+
+        if(imageUrl.StartsWith("http") == true)
+        {
+           
+            imagenRequerida = "* El Campo Firma es Obligatorio.";
+            return;
+
+        }
+
+        try
+        {
+            imagenRequerida = null;
+            foreach (var file in selectedFiles)
+            {
+
+                if (file.Size > 0 && file.Size < 8000000)
+                {
+
+                    preloader = true;
+                    Stream stream = file.OpenReadStream(maxAllowedSize: 8000000);
+                    MemoryStream ms = new MemoryStream();
+                    await stream.CopyToAsync(ms);
+                    stream.Close();
+
+                    firma.FileName = file.Name;
+                    firma.FileContent = ms.ToArray();
+                    ms.Close();
+
+
+
+                    var response = await Http.PostAsJsonAsync("api/usuarios/crearFirma", firma);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+
+                        Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+                        if (respuesta.res == "true")
+                        {
+                            //navigationManager.NavigateTo("/", true);
+                            try
+                            {
+
+                                var response_data = await Http.GetAsync($"api/usuarios/tenerUsuario/{data}");
+                                response_data.EnsureSuccessStatusCode();
+                                //respuesta = await Http.GetFromJsonAsync<RegistroUsuario>($"api/usuarios/tenerUsuario/{customClaimValue}");
+                                usuario = await response_data.Content.ReadFromJsonAsync<UsuarioGeneralDto>();
+
+                                preloader = false;
+                                metodoCambiarEstilo();
+                                pantalla = "Contrato";
+                                navigationManager.NavigateTo("contrato-personal");
+
+
+                            }
+                            catch (Exception ex)
+                            {
+                                preloader = false;
+                                navigationManager.NavigateTo("logout");
+
+
+                            }
+
+                        }
+
+                    }
+                    else
+                    {
+                        if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+                        {
+                            preloader = false;
+                            navigationManager.NavigateTo("logout");
+
+                        }
+                    }
+
+                    selectedFiles = null;
+                }
+                else
+                {
+
+                    imagenRequerida = $"* El Tamaño de la Imagen es mayor a 8MB";
+                }
+
+
+
+                //        await Http.PostAsJsonAsync<UploadedFile>
+                //("api/usuarios/crearFirma", uploadedFile);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            imagenRequerida = "* El Campo Firma es Obligatorio.";
+        }
+
+
+
+
+
+    }
+
+
+    //---------------------Contrato--------------------
+    private void contrato()
+    {
+        navigationManager.NavigateTo("contrato-personal");
+    }
+
+}

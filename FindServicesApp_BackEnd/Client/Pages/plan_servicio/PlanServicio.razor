@@ -1,0 +1,221 @@
+﻿@page "/plan-servicio"
+
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization;
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+
+@using System.Text.Json;
+@using System;
+@using System.Globalization;
+
+
+
+<div class="container" style="background-color: #015AAA; max-width: 100%; ">
+
+
+    <section class="pricing  ">
+        @*py-5*@
+        <div class="container">
+            <div class="row">
+                <!-- Free Tier -->
+
+                @if (categoria_planes.Count != 0)
+                {
+
+                    @foreach (var plan in categoria_planes)
+                    {
+                        <div class="col-lg-4 py-4">
+                            <div class="card mb-5 mb-lg-0 panel" style="top: 15px; height: 100%">
+                                <div class="card-body">
+                                    <h5 class="card-title text-muted text-uppercase text-center" style="font-size:15px">@plan.nombre_plan</h5>
+                                    <h6 class="card-price text-center colorNegro">
+                                        @*@plan.precio.ToString("0,0.00")*@
+                                        @*@decimal.Round(plan.precio, 2)*@
+                                        @*@plan.precio.ToString("N2")*@
+                                         
+                                       @* @ConverirNumerosDecimal(plan.precio)*@
+                                       @* <br />*@
+                                        @numeroParseado(plan.precio)
+                                         
+                                        <span class="period">
+                                            Lempiras
+                                        </span>
+                                    </h6>
+                                    <hr>
+                                    <ul class="fa-ul">
+                                        @foreach (var descripcion in plan.Planes)
+                                        {
+                                            <li class="colorNegro"><span class="fa-li"><i class="fa fa-check"></i></span>@descripcion.descripcion</li>
+
+                                        }
+
+                                        @if (plan.Id == 1 || plan.Id == 2)
+                                        {
+                                            <li class="exepcion"><!--!--><span class="fa-li"><i class="fa fa-check"></i></span>Aparecer como las primeras opciones de búsqueda, siempre y cuando este bien calificado por los clientes.</li>
+                                        }
+
+                                        @*<li class="text-muted">
+                                                <span class="fa-li"><i class="fas fa-times"></i></span>Unlimited
+                                                Private Projects
+                                            </li>*@
+
+                                    </ul>
+                                    <div class="align_center" style="">
+                                        <button type="submit" class="button type1" style="width:100%">
+                                            <span><span style="padding-top:10px; color:white">Adquirir Plan</span><span style="padding-top:10px">Adquirir Plan</span></span>
+                                        </button>
+                                    </div>
+                                    @*@if (plan.Id == 1)
+                                        {
+                                            <div class="align_center" style="display: flex; flex-direction: column; align-items: center; justify-content: end; height: 23.9%;">
+                                                <button type="submit" class="button type1" style="width:100%">
+                                                    <span><span style="padding-top:10px; color:white">Elejir Plan</span><span style="padding-top:10px">Elejir Plan</span></span>
+                                                </button>
+                                            </div>
+                                        }
+                                        @if (plan.Id == 2)
+                                        {
+                                            <div class="align_center" style="display: flex; flex-direction: column; align-items: center; justify-content: end; height: 23.9%;">
+                                                <button type="submit" class="button type1" style="width:100%">
+                                                    <span><span style="padding-top:10px; color:white">Elejir Plan</span><span style="padding-top:10px">Elejir Plan</span></span>
+                                                </button>
+                                            </div>
+                                        }
+
+                                        @if (plan.Id == 3)
+                                        {
+                                            <div class="align_center"   >
+                                                <button type="submit" class="button type1" style="width:100%">
+                                                    <span><span style="padding-top:10px; color:white">Elejir Plan</span><span style="padding-top:10px">Elejir Plan</span></span>
+                                                </button>
+                                            </div>
+                                        }*@
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+
+
+
+                }
+
+
+                @*<div class="col-lg-4">
+                        <div class="card mb-5 mb-lg-0 panel">
+                            <div class="card-body">
+                                <h5 class="card-title text-muted text-uppercase text-center">Plus</h5>
+                                <h6 class="card-price text-center">$9<span class="period">/month</span></h6>
+                                <hr>
+                                <ul class="fa-ul">
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span><strong>5 Users</strong></li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>50GB Storage</li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Public Projects</li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Community Access</li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Private Projects</li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Dedicated Phone Support</li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Free Subdomain</li>
+                                    <li class="text-muted">
+                                        <span class="fa-li"><i class="fas fa-times"></i></span>Monthly Status
+                                        Reports
+                                    </li>
+                                </ul>
+                                <div class="d-grid">
+                                    <a href="#" class="btn btn-primary text-uppercase">Button</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card panel">
+                            <div class="card-body">
+                                <h5 class="card-title text-muted text-uppercase text-center">Pro</h5>
+                                <h6 class="card-price text-center">$49<span class="period">/month</span></h6>
+                                <hr>
+                                <ul class="fa-ul">
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span><strong>Unlimited Users</strong>
+                                    </li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>150GB Storage</li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Public Projects</li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Community Access</li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Unlimited Private Projects</li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Dedicated Phone Support</li>
+                                    <li>
+                                        <span class="fa-li"><i class="fas fa-check"></i></span><strong>Unlimited</strong> Free
+                                        Subdomains
+                                    </li>
+                                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Monthly Status Reports</li>
+                                </ul>
+                                <div class="d-grid">
+                                    <a href="#" class="btn btn-primary text-uppercase">Button</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    </section>
+
+    <br>
+</div>
+
+@code {
+
+    List<Categoria_planes> categoria_planes = new List<Categoria_planes>();
+
+
+    private string numeroParseado(int miNumero)
+    {
+        //int miNumero = 1500;
+        CultureInfo cultura = new CultureInfo("en-US"); // Establecer la cultura en inglés de Estados Unidos
+        string miNumeroFormateado = miNumero.ToString("N2", cultura);
+        return miNumeroFormateado;
+
+    }
+
+    private string numeroParseadoa()
+    {
+        int miNumero = 1500;
+        NumberFormatInfo formatoNumerico = new NumberFormatInfo();
+        formatoNumerico.NumberGroupSeparator = ",";
+        string miNumeroFormateado = miNumero.ToString("N2", formatoNumerico);
+        return miNumeroFormateado;
+    }
+
+    private string ConverirNumerosDecimal(int miNumero)
+    {
+
+        string miNumeroFormateado = miNumero.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("es-HN"));
+        return miNumeroFormateado;
+    }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        try
+        {
+            var response = await Http.GetAsync("api/Plan/tipo/planes");
+            response.EnsureSuccessStatusCode();
+
+            categoria_planes = await response.Content.ReadFromJsonAsync<List<Categoria_planes>>();
+
+            //var response = await Http.GetAsync("api/Plan/tipo/planes");
+            //response.EnsureSuccessStatusCode();
+
+            //categoria_planes = await response.Content.ReadFromJsonAsync<List<Categoria_planes>>();
+        }
+        catch (Exception)
+        {
+
+            navigationManager.NavigateTo("logout");
+        }
+
+    }
+}

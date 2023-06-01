@@ -1,0 +1,161 @@
+﻿
+.parrafo_chiquito {
+    /*display: inline;*/
+    font-size: 14px;
+    color: #626262;
+}
+
+.text-danger {
+    color: #f71e3f !important;
+}
+
+a.text-danger:hover, a.text-danger:focus {
+    color: #c20723 !important;
+}
+
+.popup_holder.subscribe14 .popup {
+    /*background: url(../images/personaje_alegre.jpg) no-repeat left #fff;*/
+    max-width: 675px;
+    /*padding: 60px 50px 60px 280px;*/
+    color: #646464;
+}
+
+.popup_holder {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+    background: rgba(0,0,0,.5);
+    text-align: center;
+    overflow-y: auto;
+    /*pointer-events: none;*/
+}
+
+    .popup_holder .popup {
+        padding: 30px;
+        background: #fff;
+        display: inline-block;
+        vertical-align: middle;
+        position: relative;
+        text-align: left;
+    }
+
+    /*.modal-backdrop {
+    pointer-events: none;
+}*/
+
+    .popup_holder.subscribe14 .popup h2 {
+        font-size: 36px;
+        color: #015AAA;
+        font-weight: 300;
+        text-transform: none;
+    }
+
+        .popup_holder.subscribe14 .popup h2 span {
+            font-weight: 900;
+        }
+
+    .popup_holder.subscribe14 .popup .button {
+        margin-top: 25px;
+    }
+
+    .popup_holder.subscribe14 .popup #closePopup {
+        color: #a4a4a4;
+    }
+
+#closePopup,
+.closePopup {
+    color: #a4a4a4;
+    -webkit-transition: all .3s ease;
+    -o-transition: all .3s ease;
+    transition: all .3s ease;
+}
+
+    #closePopup:hover,
+    .closePopup:hover {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+
+table tr td .closePopup {
+    position: relative;
+    top: auto;
+    right: auto;
+    font-size: 14px;
+}
+
+.mad_main6 .popup_holder.subscribe14 .popup {
+    color: #555;
+}
+
+    .mad_main6 .popup_holder.subscribe14 .popup h2 {
+        font-size: 35px;
+        color: #ec3238;
+        font-weight: normal;
+        text-transform: none;
+    }
+
+
+.parrafo_chiquito {
+    display: inline;
+    font-size: 10px;
+    color: #626262;
+}
+
+.agregar {
+    color: #015AAA;
+    text-decoration: none;
+    background-color: transparent;
+}
+
+    .agregar:hover {
+        color: #003564;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+.cambio_color {
+    color: #000000;
+}
+
+select:focus {
+    outline: none;
+}
+
+.valid.modified:not([type=checkbox]) {
+    /*outline: 1px solid #26b050;*/
+    outline: none;
+}
+
+/*.invalid {
+    outline: 1px solid red;*/
+/*border-bottom: 1px solid red;*/
+/*}*/
+
+.validation-message {
+    color: red;
+}
+
+
+.file-input-container {
+    position: relative;
+    max-width: 1500px;
+    height: 40px;
+    border: 1px solid #ccc;
+}
+
+    .file-input-container input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }

@@ -1,0 +1,225 @@
+﻿
+@using System.Text.Json;
+
+@inject HttpClient Http
+@inject NavigationManager Navigator
+@inject ILoginService loginService
+@using FindServicesApp_BackEnd.Client.Auth
+
+@inject IJSRuntime JSRuntime
+@*style="display: none;"*@
+<div class="popup_holder subscribe14" style="@Estilo">
+    <div class="popup" style="border-radius: 4px; padding: 0px; margin-top: 14px; margin-bottom: 14px; width: 550px; max-width: 100%; ">
+
+        <div class="align_center" style="padding-top:10px">
+            <!--!-->
+            <h2>
+                @*Refer*@ <!--<span> Titulo</span>-->
+            </h2>
+            <!--!-->
+        </div>
+
+
+
+        <div class="container" style="background: white; max-width: 100%; width:100%; padding-left: 10px; padding-right: 10px ">
+
+            <div class="row">
+
+
+
+                <div class="col-sm-12" style="  padding-left: 23px; padding-right: 24px; ">
+          
+                    <h4 style="text-align:center;font-size: 25px;font-weight: bold;">Iniciar Sesión</h4>
+                    <EditForm Model="login" OnValidSubmit="LoginMetodo" class="form_type_1 type_2">
+                        <DataAnnotationsValidator />
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Correo</label>
+                            <InputText style="color: #000000" class="cambio_color" placeholder="Ingresa tu correo electronico" name="textinput" @bind-Value="@login.Email" />
+                            <ValidationMessage For="@(() => login.Email)" />
+                        </div>
+
+                        @*<div class="control-group">
+                                <label class="control-label cambio_color">Contraseña</label>
+                                <InputText style="color: #000000" type="password" Class="form-control" placeholder="Introducir la contraseña " @bind-Value="@login.Password" />
+
+                                <ValidationMessage For="@(() => login.Password)" />
+                            </div>*@
+
+                        <div class="control-group" style="margin-top: 15px;">
+                            <label class="control-label cambio_color">Contraseña</label>
+
+                            <div class="container_interno" style=" max-width: 700px; width: 100%;">
+                                <div class="wrapp-input" style="position: relative; width: 100%; min-height: 50px;">
+                                    <span class="icon-aye" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" @onclick="TogglePasswordVisibility">
+                                        <i style="color:black" class="@PasswordIcon"></i>
+                                    </span>
+
+                                    <InputText @bind-Value="@login.Password"
+                                               style="color: #000000; background: transparent; text-align: left; width: 100%; border: 1px solid #4e4e4e; line-height: inherit; height: 40px; padding: 10px 15px; -webkit-transition: all .3s ease; -o-transition: all .3s ease; transition: all .3s ease;"
+                                               type="@isPassword"
+                                               placeholder="Introducir la Contraseña" />
+
+                                </div>
+
+
+                            </div>
+
+                            <ValidationMessage For="@(() => login.Password)" />
+                        </div>
+
+
+                        <div class="align_center"  >
+                            <button type="submit" class="button type1" style="width: 100%; margin-top:15px">
+                                <span><span style="color:white">Iniciar Sesion</span><span>Iniciar Sesion</span></span>
+                            </button>
+                        </div>
+
+                        <br />
+
+                        <div class="align_center">
+                            <label class="cambio_color">¿No tienes una Cuenta?</label>
+                            <a class="angotar" @onclick="abrirRegistro"><label style="color: #015AAA; cursor: pointer; ">Crear Una Cuenta.</label></a>
+
+                        </div>
+
+                        <div class="align_center" style="margin-top:10px">
+                            <label class="cambio_color">¿No recuerdas tu contraseña?</label>
+                            <a class="angotar" @onclick="recuperar_password"><label style="color: #015AAA; cursor: pointer; ">Recuperar.</label></a>
+
+                        </div>
+                        <br />
+
+                    </EditForm>
+
+
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+        <a id="closePopup" @onclick="cerrarVentana"></a>
+    </div>
+</div>
+
+@if (AbrirModal == true)
+{
+    <MensajeModal Estilo="@estilo" Titulo="@titulo" Cuerpo="@mensaje" cerrarVentana="@(() => cerrarModal())"></MensajeModal>
+}
+
+
+
+@if (preloader == true)
+{
+    <Preloader></Preloader>
+}
+
+@code {
+
+
+
+    [Parameter] public string Estilo { get; set; }
+    [Parameter] public EventCallback cerrarVentana { get; set; }
+    [Parameter] public EventCallback abrirRegistro { get; set; }
+
+
+    Login login = new Login();
+    private bool AbrirModal = false, preloader = false;
+    private string titulo = "", mensaje = "", estilo = "";
+
+
+    private bool IsPasswordVisible { get; set; } = false;
+    private string PasswordIcon => IsPasswordVisible ? "fa fa-eye-slash" : "fa fa-eye";
+    private string isPassword => IsPasswordVisible ? "text" : "password";
+
+
+    private void TogglePasswordVisibility()
+    {
+        IsPasswordVisible = !IsPasswordVisible;
+    }
+
+    IJSObjectReference module;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+        login.Email = "cesar@cesar.com";
+        login.Password = "1234567890";
+    }
+
+    async Task LoginMetodo()
+    {
+        AbrirModal = false;
+        preloader = true;
+        var response = await Http.PostAsJsonAsync("api/usuarios/loginUsuario", login);
+        if (response.IsSuccessStatusCode)
+        {
+
+            //Console.WriteLine(await response.Content.ReadAsStringAsync());
+
+            Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+
+            if (respuesta.res == "true")
+            {
+                await module.InvokeVoidAsync("cambiarOverflowActivo");
+                await cerrarVentana.InvokeAsync();
+                //Console.WriteLine(respuesta.res);
+                //Console.WriteLine(respuesta.token);
+                await loginService.Login(respuesta.token.ToString());
+                Navigator.NavigateTo("");
+                mensaje = $"Usuario Correctos.";
+                titulo = "Login de Usuarios";
+                //AbrirModal = true;
+                preloader = false;
+            }
+            else
+            {
+                mensaje = $"El correo y contraseña que usted ingreso no son correctos. Asegurese que el correo {login.Email} o la contraseña sean la correcta.";
+                titulo = "Login de Usuarios";
+                AbrirModal = true;
+                preloader = false;
+            }
+
+
+
+
+            //Console.WriteLine(respuesta.otro);
+        }
+        else
+        {
+            if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+            {
+
+                //en teoria seria mandarlo al login por si se vence el token
+            }
+        }
+    }
+
+
+    private void cerrarModal()
+    {
+        AbrirModal = !AbrirModal;
+        estilo = AbrirModal == true ? "display: none;" : "";
+    }
+
+    private async Task recuperar_password()
+    {
+        await module.InvokeVoidAsync("cambiarOverflowActivo");
+        await cerrarVentana.InvokeAsync();
+        Navigator.NavigateTo("recuperar-contraseña");
+    }
+
+    private async Task crear_usuarios()
+    {
+        await module.InvokeVoidAsync("cambiarOverflowActivo");
+        await cerrarVentana.InvokeAsync();
+        Navigator.NavigateTo("crear-usuarios");
+    }
+
+}

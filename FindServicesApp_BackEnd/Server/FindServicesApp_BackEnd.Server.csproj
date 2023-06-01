@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+	<TargetFramework>net6.0</TargetFramework>
+	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.15" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.14" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.4" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.4">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.4">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+	<PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\Client\FindServicesApp_BackEnd.Client.csproj" />
+	<ProjectReference Include="..\Shared\FindServicesApp_BackEnd.Shared.csproj" />
+  </ItemGroup>
+	
+  <ItemGroup>
+	<Watch Include="..\**\*.razor" />
+	<Watch Include="..\**\*.scss" />
+	<Watch Include="..\**\*.cs" />
+
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Compile Remove="wwwroot\zoom\**" />
+    <Content Remove="wwwroot\zoom\**" />
+    <EmbeddedResource Remove="wwwroot\zoom\**" />
+    <None Remove="wwwroot\zoom\**" />
+    <Watch Remove="wwwroot\zoom\**" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Watch Remove="Controllers\contrato\ContratoController.cs" />
+    <Watch Remove="Controllers\departamentos_municipios\DeptosController.cs" />
+    <Watch Remove="Controllers\Educacion\EducacionesController.cs" />
+    <Watch Remove="Controllers\experiencia_laboral\ExperienciaLaboralController.cs" />
+    <Watch Remove="Controllers\plan_servicios\PlanController.cs" />
+    <Watch Remove="Controllers\preguntas_seguridad\PreguntasSeguridadController.cs" />
+    <Watch Remove="Controllers\Profesiones\ProfesionesController.cs" />
+    <Watch Remove="Controllers\usuarios\UsuariosController.cs" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\firmas\" />
+  </ItemGroup>
+ 
+</Project>

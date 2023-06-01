@@ -1,0 +1,230 @@
+﻿@using System.Text.Json;
+
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+@using System.Text.RegularExpressions
+
+@using System.Globalization
+@using System.Text;
+
+@*style="display: none;"*@
+<div class="popup_holder subscribe14" style="@Estilo">
+    <div class="popup" style="border-radius: 4px; padding: 0px; margin-top: 14px; margin-bottom: 14px; width: 675px; max-width:100%; ">
+
+        <div class="align_center" style="padding-top:10px">
+            <!--!-->
+            <h2>
+                @*Refer*@ <span>@Titulo</span>
+            </h2>
+            <!--!-->
+        </div>
+
+
+
+        <div class="container" style="background: white; max-width: 100%; padding-left: 10px; padding-right: 10px ">
+
+            <div class="row">
+
+
+
+                <div class="col-sm-12" style="  padding-left: 23px; padding-right: 24px; ">
+                    <br />
+
+                    <div class="align_center">
+
+                        <div class="align_center">
+                            <label class="control-label cambio_color">Camara</label>
+
+                            <video id="videoElement" autoplay style=" max-width: 100%; width: 100%; border-radius: 4px; background-color: rgb(175 175 175 / 10%); box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.6) ">
+                                Dar Permisos para mostrar video.
+                            </video>
+                        </div>
+
+                        <br />
+                        @if (ListadoCamaras.Count != 0)
+
+                        {
+
+
+                            <div class="control-group">
+                                <label class="control-label cambio_color">Seleccione la Camara </label>
+                                <div class="custom_select">
+                                    <select @onchange="OnSelectChanged" class="cambio_color custom_select select_title" style="width: 100%; height: 40px; color: #000000 ">
+                                        @foreach (var item in ListadoCamaras)
+                                        {
+                                            @if (item.contador == 0)
+                                            {
+                                                <option selected value="@item.value">@item.text</option>
+
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.value">@item.text</option>
+
+                                            }
+
+                                        }
+
+                                    </select>
+
+                                </div>
+                            </div>
+
+
+                            <button @onclick="TomarFotoYBase64" type="submit" class="button type1  " style="margin-top:5px">
+                                <span><span style="color:white">Capturar Foto</span><span>Capturar Foto</span></span>
+                            </button>
+
+
+                        }
+
+                        @if (datosStream.PermisosConcedidos == false)
+                        {
+                            <p class="control-label cambio_color" style="font-weight:bold">
+                                Tiene que Habilitar los permisos de la Camara
+                            </p>
+                        }
+
+                        @if (ErrorEnCamara.tipoError != "funciona")
+                        {
+                            <p class="control-label cambio_color" style="font-weight:bold">
+                                Otro Tipo de Error puede ser: @ErrorEnCamara.tipoError
+                            </p>
+                        }
+
+
+                        <canvas id="canvasElement" style=" max-width: 100%; width: 100%; border-radius: 4px; background-color: rgb(175 175 175 / 10%); box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.6) "></canvas>
+
+
+
+                        @if (base64 != "")
+                        {
+
+                            <button @onclick="@EnviarData" type="submit" class="button type1  ">
+                                <span><span style="color:white">Guardar Foto</span><span>Guardar Foto</span></span>
+                            </button>
+
+
+                        }
+                        <br />
+
+
+                    </div>
+
+                    
+
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+        <a id="closePopup" @onclick="cerrarVentana"></a>
+    </div>
+</div>
+
+@code {
+
+
+    //[Parameter] public EventCallback<Educacion> CrearOModificar { get; set; }
+    [Parameter] public string Titulo { get; set; }
+    [Parameter] public string Estilo { get; set; }
+    [Parameter] public EventCallback cerrarVentana { get; set; }
+    [Parameter] public EventCallback<string> tenerBase64 { get; set; }
+
+
+    VideoStream datosStream = new VideoStream();
+    List<CamaraInfo> ListadoCamaras = new List<CamaraInfo>();
+    TipoErrorEncenderCamara ErrorEnCamara = new TipoErrorEncenderCamara();
+
+    IJSObjectReference module;
+    string tomarIdDispositivo = "";
+    string base64="";
+
+    protected override async Task OnInitializedAsync()
+    {
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+
+
+        await module.InvokeVoidAsync("permisosVideo");
+        datosStream = await module.InvokeAsync<VideoStream>("permisosVideo");
+        if(datosStream.PermisosConcedidos == true)
+        {
+            //Console.WriteLine("Con Permisos");
+            ListadoCamaras = await module.InvokeAsync<List<CamaraInfo>>("TenerCamaras");
+            tomarIdDispositivo = ListadoCamaras[0].value;
+            ErrorEnCamara = await module.InvokeAsync<TipoErrorEncenderCamara>("ComenzarCamara", tomarIdDispositivo);
+
+        }
+        else
+        {
+            Console.WriteLine("Sin Permisos");
+        }
+
+
+    }
+
+    private async Task TomarFotoYBase64()
+    {
+
+
+
+        base64 = await module.InvokeAsync<string>("tomarFotoBase64Camara");
+
+
+
+    }
+
+    private async Task EnviarData()
+    {
+
+
+       await tenerBase64.InvokeAsync(base64);
+        //await CrearOModificar.InvokeAsync(Modelo_Educacion);
+
+
+    }
+
+    private async Task OnSelectChanged(ChangeEventArgs e)
+    {
+
+        tomarIdDispositivo = e.Value.ToString();
+
+        ErrorEnCamara = await module.InvokeAsync<TipoErrorEncenderCamara>("ComenzarCamara", tomarIdDispositivo);
+
+
+    }
+
+
+
+
+    //private async Task mostrarOverFlow()
+    //{
+
+    //    await module.InvokeVoidAsync("cambiarOverflowActivo");
+    //}
+
+    public class VideoStream
+    {
+        public bool PermisosConcedidos { get; set; }
+
+    }
+
+    public class CamaraInfo
+    {
+        public int contador { get; set; }
+        public string value { get; set; }
+        public string text { get; set; }
+    }
+
+    public class TipoErrorEncenderCamara
+    {
+        public string tipoError { get; set; } = "funciona";
+    }
+
+
+}

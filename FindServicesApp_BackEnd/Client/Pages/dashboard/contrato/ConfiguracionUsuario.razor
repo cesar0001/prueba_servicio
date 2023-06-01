@@ -1,0 +1,447 @@
+﻿
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+
+@using System.Text.Json;
+<div class="container" style="background: white; max-width: 100%; width: 100%; ">
+
+    <div class="row">
+
+        <div class="col-12 col-md-12 col-ms-12">
+            <br />
+            <br />
+
+            <EditForm Model="UsuarioDto" OnValidSubmit="@OnValidSubmit" class="form_type_1 type_2">
+                <DataAnnotationsValidator />
+
+                <div class="row">
+                    <div class="col-md-12 col-ms-12">
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Correo Electronico</label>
+                            <InputText disabled="true" style="color: #000000" placeholder="Correo Electronico" name="textinput" @bind-Value="@UsuarioDto.Correo" />
+                            <ValidationMessage For="@(() => UsuarioDto.Correo)" />
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Clave Actual</label>
+                            @*<InputText type="password" style="color: #000000" Class="form-control cambio_color" placeholder="Clave Actual " @bind-Value="@UsuarioDto.ContraseñaActual" />*@
+
+
+                            <div class="container_interno" style=" max-width: 700px; width: 100%;">
+                                <div class="wrapp-input" style="position: relative; width: 100%; min-height: 50px;">
+                                    <span class="icon-aye" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" @onclick="TogglePasswordVisibility_1">
+                                        <i style="color:black" class="@PasswordIcon_1"></i>
+                                    </span>
+
+                                    <InputText @bind-Value="@UsuarioDto.ContraseñaActual"
+                                               style="color: #000000; background: transparent; text-align: left; width: 100%; border: 1px solid #4e4e4e; line-height: inherit; height: 40px; padding: 10px 15px; -webkit-transition: all .3s ease; -o-transition: all .3s ease; transition: all .3s ease;"
+                                               type="@isPassword_1"
+                                               placeholder="Clave Actual" />
+
+                                </div>
+
+
+                            </div>
+
+
+                            <ValidationMessage For="@(() => UsuarioDto.ContraseñaActual)" />
+                        </div>
+
+
+
+                    </div>
+
+                    <div class="col-md-6 col-ms-6">
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">Nueva Contraseña </label>
+                            @*<InputText type="password" style="color: #000000" Class="form-control" placeholder="Nueva contraseña " @bind-Value="@UsuarioDto.ContraseñaNueva" />*@
+
+
+
+                            <div class="container_interno" style=" max-width: 700px; width: 100%;">
+                                <div class="wrapp-input" style="position: relative; width: 100%; min-height: 50px;">
+                                    <span class="icon-aye" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" @onclick="TogglePasswordVisibility_2">
+                                        <i style="color:black" class="@PasswordIcon_2"></i>
+                                    </span>
+
+                                    <InputText @bind-Value="@UsuarioDto.ContraseñaNueva"
+                                               style="color: #000000; background: transparent; text-align: left; width: 100%; border: 1px solid #4e4e4e; line-height: inherit; height: 40px; padding: 10px 15px; -webkit-transition: all .3s ease; -o-transition: all .3s ease; transition: all .3s ease;"
+                                               type="@isPassword_2"
+                                               placeholder="Nueva contraseña" />
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <ValidationMessage For="@(() => UsuarioDto.ContraseñaNueva)" />
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6 col-ms-6">
+
+                        <div class="control-group">
+                            <label class="control-label cambio_color">
+                                Confirmar Nueva Contraseña
+                            </label>
+                            @*<InputText type="password" style="color: #000000" Class="form-control" placeholder="Confirmar Nueva Contraseña
+                                       " @bind-Value="@UsuarioDto.ConfirmarContraseña" />*@
+
+
+
+                            <div class="container_interno" style=" max-width: 700px; width: 100%;">
+                                <div class="wrapp-input" style="position: relative; width: 100%; min-height: 50px;">
+                                    <span class="icon-aye" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" @onclick="TogglePasswordVisibility_3">
+                                        <i style="color:black" class="@PasswordIcon_3"></i>
+                                    </span>
+
+                                    <InputText @bind-Value="@UsuarioDto.ConfirmarContraseña"
+                                               style="color: #000000; background: transparent; text-align: left; width: 100%; border: 1px solid #4e4e4e; line-height: inherit; height: 40px; padding: 10px 15px; -webkit-transition: all .3s ease; -o-transition: all .3s ease; transition: all .3s ease;"
+                                               type="@isPassword_3"
+                                               placeholder="Confirmar Nueva Contraseña" />
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <ValidationMessage For="@(() => UsuarioDto.ConfirmarContraseña)" />
+
+
+                            <hr />
+
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="align_center" style="padding-top:10px">
+                            <button style="width:200px" type="submit" class="button type1">
+                                <span><span style="color:white">Cambiar Contraseña</span><span>Cambiar Contraseña</span></span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <br />
+
+            </EditForm>
+
+
+            <br />
+
+        </div>
+
+
+        <div class="col-12 col-md-12 col-ms-12">
+            <div class="control-group">
+                <label class="control-label cambio_color"><strong>Foto</strong> Tipos Permitidos: PNG,JPG, JPEG.</label>
+                <div class="file-input-container" style="border: none;">
+                    <InputFile accept="image/png,image/jpeg,image/jpg,image/tiff" OnChange="OnInputFileChange" />
+                </div>
+                <p class="cambio_color">
+                    La foto debe de pesar menos de 8 MB
+                </p>
+                @if (imagenRequerida != null)
+                {
+                    <p style="color:red">@imagenRequerida</p>
+                }
+
+                <div class="align_center" style="padding-top:10px">
+                    <!--!-->
+
+                    @if (imageUrl == null)
+                    {
+
+
+                        <img class="align_center" width="160px" height="160px"
+                             style="width: 160px; height: 160px; padding-top: 10px"
+                             src="images/artempty.jpeg" alt="Foto de Perfil" />
+                    }
+                    else
+                    {
+                        <img class="align_center" width="160px" height="160px"
+                             style="width: 160px; height: 160px; padding-top: 10px"
+                             src="@imageUrl" alt="Foto de Perfil" />
+                    }
+
+
+                    <!--!-->
+                </div>
+
+
+
+                <br />
+                <div class="align_center" style="padding-top:10px">
+                    <button @onclick="subirFoto" style="width:200px" type="submit" class="button type1">
+                        <span><span style="color:white">Nueva Foto</span><span>Nueva Foto</span></span>
+                    </button>
+                </div>
+                <br /><br />
+
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+
+@if (AbrirModal == true)
+{
+    <MensajeModal Estilo="@estilo" Titulo="@titulo" Cuerpo="@mensaje" cerrarVentana="@(() => cerrarModal())"></MensajeModal>
+}
+
+
+@if (preloader == true)
+{
+    <Preloader></Preloader>
+}
+
+@code {
+
+    string imagenRequerida = null;
+    UsuarioModificarDto UsuarioDto = new UsuarioModificarDto();
+    IReadOnlyList<IBrowserFile> selectedFiles;
+
+    [Parameter] public UsuarioGeneralDto Data { get; set; }
+
+    private bool AbrirModal = false, preloader = false;
+    private string titulo = "", mensaje = "", estilo = "";
+
+    private string imageUrl = null;
+
+    ImagenLocal imagenSeleccionada = new ImagenLocal();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        UsuarioDto.Id = Data.Id;
+        UsuarioDto.Correo = Data.Email;
+        imagenSeleccionada.Id = Data.Id;
+        //if (string.IsNullOrEmpty(Data.DatosGenerales.foto_personal) == true)
+        //{
+        //    imageUrl = null;
+        //}
+        //else
+        //{
+        //    imageUrl = Data.DatosGenerales.foto_personal;
+        //}
+
+    }
+
+    private void cerrarModal()
+    {
+        AbrirModal = !AbrirModal;
+        estilo = AbrirModal == true ? "display: none;" : "";
+    }
+
+
+    private bool IsPasswordVisible_1 { get; set; } = false;
+    private string PasswordIcon_1 => IsPasswordVisible_1 ? "fa fa-eye-slash" : "fa fa-eye";
+    private string isPassword_1 => IsPasswordVisible_1 ? "text" : "password";
+
+
+    private void TogglePasswordVisibility_1()
+    {
+        IsPasswordVisible_1 = !IsPasswordVisible_1;
+    }
+
+    // 2
+    private bool IsPasswordVisible_2 { get; set; } = false;
+    private string PasswordIcon_2 => IsPasswordVisible_2 ? "fa fa-eye-slash" : "fa fa-eye";
+    private string isPassword_2 => IsPasswordVisible_2 ? "text" : "password";
+
+
+    private void TogglePasswordVisibility_2()
+    {
+        IsPasswordVisible_2 = !IsPasswordVisible_2;
+    }
+
+    //3
+    private bool IsPasswordVisible_3 { get; set; } = false;
+    private string PasswordIcon_3 => IsPasswordVisible_3 ? "fa fa-eye-slash" : "fa fa-eye";
+    private string isPassword_3 => IsPasswordVisible_3 ? "text" : "password";
+
+
+    private void TogglePasswordVisibility_3()
+    {
+        IsPasswordVisible_3 = !IsPasswordVisible_3;
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFiles = e.GetMultipleFiles();
+        imagen();
+
+        var file = e.File;
+        if (file != null)
+        {
+            if (file.Size > 0 && file.Size < 8000000)
+            {
+                var buffer = new byte[file.Size];
+                await file.OpenReadStream(maxAllowedSize: 8000000).ReadAsync(buffer);
+                var base64 = Convert.ToBase64String(buffer);
+                imageUrl = $"data:{file.ContentType};base64,{base64}";
+            }
+
+
+        }
+        else
+        {
+            imageUrl = null;
+        }
+
+        this.StateHasChanged();
+    }
+
+
+    private async Task imagen()
+    {
+        try
+        {
+            imagenRequerida = null;
+            foreach (var file in selectedFiles)
+            {
+
+                if (file.Size > 0 && file.Size < 8000000)
+                {
+
+                    Stream stream = file.OpenReadStream(maxAllowedSize: 8000000);
+                    MemoryStream ms = new MemoryStream();
+                    await stream.CopyToAsync(ms);
+                    stream.Close();
+
+                    imagenSeleccionada.FileName = file.Name;
+                    imagenSeleccionada.FileContent = ms.ToArray();
+                    imagenSeleccionada.tamaño = file.Size;
+                    ms.Close();
+
+
+                    selectedFiles = null;
+                }
+                else
+                {
+
+                    imagenRequerida = $"* El Tamaño de la Imagen es mayor a 8MB";
+                }
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+            //imagenRequerida = "* El Campo Firma es Obligatorio.";
+        }
+
+
+    }
+
+
+    private async Task OnValidSubmit()
+    {
+
+
+        AbrirModal = false;
+        preloader = true;
+        var response = await Http.PostAsJsonAsync("api/Usuarios/modificar/usuario", UsuarioDto);
+        if (response.IsSuccessStatusCode)
+        {
+
+            //Console.WriteLine(await response.Content.ReadAsStringAsync());
+
+            Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+
+            if (respuesta.res == "true")
+            {
+
+                mensaje = $"Se ha Modificado la contraseña exitosamente.";
+                titulo = "Contraseña Modificada";
+                UsuarioDto.ConfirmarContraseña = "";
+                UsuarioDto.ContraseñaActual = "";
+                UsuarioDto.ContraseñaNueva = "";
+                preloader = false;
+                AbrirModal = true;
+
+            }
+            else
+            {
+                mensaje = $"La Contraseña Actual no es la correcta. Asegurese de ingresar una contraseña correcta.";
+                titulo = "Contraseña Modificada";
+                preloader = false;
+                AbrirModal = true;
+            }
+
+        }
+        else
+        {
+            if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+            {
+                navigationManager.NavigateTo("logout");
+                //en teoria seria mandarlo al login por si se vence el token
+            }
+        }
+    }
+
+
+    private async Task subirFoto()
+    {
+
+        if (string.IsNullOrEmpty(imagenSeleccionada.FileName) != true)
+        {
+
+            if (imagenSeleccionada.tamaño > 0 && imagenSeleccionada.tamaño < 8000000)
+            {
+
+                preloader = true;
+                AbrirModal = false;
+                var response = await Http.PostAsJsonAsync("api/Usuarios/modificar/imagen/usuario", imagenSeleccionada);
+                if (response.IsSuccessStatusCode)
+                {
+
+
+                    Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+                    Console.WriteLine(respuesta.res);
+
+                    if (respuesta.res == "true")
+                    {
+                        preloader = false;
+                        //mensaje = $"La Imagen ha sido modificada Exitosamente.";
+                        //titulo = "Imagen Modificada";
+                        //AbrirModal = true;
+                        navigationManager.NavigateTo("configuracion-personal", forceLoad: true);
+                    }
+                    else
+                    {
+                        mensaje = $"La imagen no se pudo Modificar.";
+                        titulo = "Imagen Modificada";
+                        AbrirModal = true;
+                        preloader = false;
+                    }
+
+                }
+                else
+                {
+                    if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+                    {
+                        navigationManager.NavigateTo("logout");
+                        //en teoria seria mandarlo al login por si se vence el token
+                    }
+                }
+            }
+        }
+
+
+    }
+
+}

@@ -1,0 +1,13 @@
+﻿a {
+    color: #015AAA;
+    text-decoration: none;
+    background-color: transparent;
+}
+
+.estiloParrafo {
+    font-size: 15px;
+    line-height: 1.625;
+    letter-spacing: -0.08px;
+    margin-bottom: 1.5625rem !important;
+
+}

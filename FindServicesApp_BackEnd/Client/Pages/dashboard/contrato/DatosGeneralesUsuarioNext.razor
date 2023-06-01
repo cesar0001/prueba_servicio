@@ -1,0 +1,958 @@
+﻿@using System.Text.Json;
+
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+@using System.Text.RegularExpressions
+
+<div class="container" style="background: white; max-width: 100%; width: 100%; ">
+    @*<h2>Contact Us</h2>*@
+    <div class="row">
+
+
+
+        <div class="col-sm-12">
+            <br />
+
+            <div class="row">
+
+                <div class="col-md-12 col-ms-12" style="margin-bottom:30px">
+
+
+                    <div class="control-group">
+                        <label class="control-label cambio_color" style=" font-weight: 600;">
+
+
+                            Acerca de @(usuario.DatosGenerales != null? usuario.DatosGenerales.Nombre : "") (<a @onclick="@Atras" class="agregar">Editar</a> )
+                            <br />
+                            Profesión: @(usuario.DatosGenerales != null ? usuario.DatosGenerales.Profesion.NombreProfesion : "")
+                        </label>
+                        <br />
+                    </div>
+
+                </div>
+
+
+
+
+
+                <div class="col-12 col-md-12 col-ms-12" style="margin-bottom:25px">
+                    <label class="control-label cambio_color" style=" font-weight: 600;">
+                        Experiencia laboral <p class="parrafo_chiquito">Agrega tus últimos 3 trabajos</p>
+
+                    </label>
+                    <br />
+
+                    @if (experiencias_lab.Count() <= 2)
+                    {
+                        <a @onclick="(e) => modal_experiencia_laboral(0)" class="agregar">Agregar</a>
+
+                    }
+                    @if (experiencias_lab.Count() == 0)
+                    {
+                        <a @onclick="@guardarSinExperiencia" class="text-danger">
+
+                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+                            Si no tienes Experiencias dar click aqui
+                        </a>
+                    }
+
+                    @foreach (var item in experiencias_lab)
+                    {
+                        <ListadoExperienciaLaboral ModificarExperienciaLab="@ModificarExperienciaLaboral"
+                                                   EliminarExperienciaLab="@EliminarExperiencias"
+                                                   experiencia_laboral="@item"></ListadoExperienciaLaboral>
+
+                    }
+
+                    @if (experiencias_lab.Count() == 0)
+                    {
+                        <div class="validation-message">* El Campo Experiencia laboral es Obligatorio.</div>
+
+                    }
+
+                </div>
+
+
+                <div class="col-12 col-md-12 col-ms-12" style="margin-bottom:20px">
+                    <label class="control-label cambio_color" style=" font-weight: 600;">
+                        Educacion <p class="parrafo_chiquito">Agrega tus últimos 3 estudios</p>
+
+                    </label>
+                    <br />
+
+                    @if (educacion_listado.Count() <= 2)
+                    {
+                        <a @onclick="(e) => modal_estudios(0)" class="agregar">Agregar</a>
+
+                    }
+
+                    @foreach (var item in educacion_listado)
+                    {
+                        <ListadoEducacion educacion="@item"
+                                          ModificarEducacion="@ModificarEducacion"
+                                          EliminarEducacion="@EliminarEducacion"></ListadoEducacion>
+                    }
+
+                    @if (educacion_listado.Count() == 0)
+                    {
+                        <div class="validation-message">* El Campo Educacion es Obligatorio.</div>
+
+                    }
+
+
+
+
+
+                </div>
+
+                <div class="col-12 col-md-12 col-ms-12">
+
+                    <label class="control-label cambio_color" style=" font-weight: 600;">
+                        Seccion de Foto de Perfil
+                    </label>
+                    <div class="align_center">
+                        <a @onclick="@abrirModalFotoPerfil" class="agregar">Tomar Foto de Perfil</a>
+                    </div>
+
+
+                    <div class="align_center">
+
+
+                        @if (imageUrlPerfil == null)
+                        {
+
+
+                            <img class="align_center" width="160px" height="160px"
+                                 style="width: 160px; height: 160px; padding-top: 10px"
+                                 src="images/artempty.jpeg" alt="Foto de Perfil" />
+
+                            <div class="validation-message">* El Campo Obligatorio.</div>
+
+
+                        }
+                        else
+                        {
+                            <div style="border-radius: 4px">
+                                <img class="align_center" width="160px" height="160px"
+                                     style="width: 160px; height: 160px; padding-top: 10px; border-radius:4px"
+                                     src="@imageUrlPerfil" alt="Foto de Perfil" />
+                            </div>
+
+                            @if (errorImagenPerfil == false)
+                            {
+                                <div class="validation-message">
+                                    * La foto debe de pesar menos de 8 MB
+                                </div>
+                            }
+
+                        }
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-12 col-ms-12">
+                    <label class="control-label cambio_color" style=" font-weight: 600;">
+                        Seccion de Foto de Identidad
+                    </label>
+
+                </div>
+
+
+                <div class="col-6 col-md-6 col-ms-6">
+
+                    <div class="align_center">
+                        <a @onclick="@abrirModalFotoIdentidadAdelantera" class="agregar">Foto para Identidad Adelantera</a>
+
+                    </div>
+
+                    <div class="align_center">
+
+
+
+                        @if (imageUrlIdentidadDelantera == null)
+                        {
+
+
+                            <img class="align_center" width="160px" height="160px"
+                                 style="width: 160px; height: 160px; padding-top: 10px"
+                                 src="images/artempty.jpeg" alt="Foto de Perfil" />
+
+                            <div class="validation-message">* El Campo es Obligatorio.</div>
+
+                        }
+                        else
+                        {
+                            <div style="border-radius: 4px">
+                                <img class="align_center" width="160px" height="160px"
+                                     style="width: 160px; height: 160px; padding-top: 10px; border-radius:4px"
+                                     src="@imageUrlIdentidadDelantera" alt="Foto de Identidad" />
+                            </div>
+
+                            @if (errorImagenIdentiAdelantera == false)
+                            {
+                                <div class="validation-message">
+                                    * La foto debe de pesar menos de 8 MB
+                                </div>
+                            }
+
+                        }
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-6 col-ms-6">
+
+
+                    <div class="align_center">
+                        <a @onclick="@abrirModalFotoIdentidadTrasera" class="agregar">Foro para identidad Trasera</a>
+
+                    </div>
+
+                    <div class="align_center">
+
+
+
+                        @if (imageUrlIdentidadTrasera == null)
+                        {
+
+
+                            <img class="align_center" width="160px" height="160px"
+                                 style="width: 160px; height: 160px; padding-top: 10px"
+                                 src="images/artempty.jpeg" alt="Foto de Perfil" />
+
+                            <div class="validation-message">* El Campo es Obligatorio.</div>
+                        }
+                        else
+                        {
+                            <div style="border-radius: 4px">
+                                <img class="align_center" width="160px" height="160px"
+                                     style="width: 160px; height: 160px; padding-top: 10px; border-radius:4px"
+                                     src="@imageUrlIdentidadTrasera" alt="Foto de Identidad" />
+                            </div>
+
+                            @if (errorImagenIdentiTrasera == false)
+                            {
+                                <div class="validation-message">
+                                    * La foto debe de pesar menos de 8 MB
+                                </div>
+                            }
+
+                        }
+                    </div>
+                </div>
+
+
+
+            </div>
+
+
+            <div class="align_center" style="padding-top:10px">
+
+                <div class="col-12 col-md-12 col-ms-12 " style="padding-left:0px">
+                    <div class="control-group">
+
+
+                        <button @onclick="guardarDatos" type="submit" class="button type1 text-align:end">
+                            <span><span style="color:white">Guardar Fotos</span><span>Guardar Fotos</span></span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <br />
+
+        </div>
+    </div>
+</div>
+
+@if (AbrirModal == true)
+{
+
+    <FormularioExperienciaPersonal btncerrar="@btnCerrarExpeLaboral"
+                                   id_experiencia_lab="@id_laboratorio"
+                                   id_usuario="@usuario.Id"
+                                   Estilo="@estilo"
+                                   Titulo="@titulo"
+                                   CrearOModificar="@GuardarExperienciaLaboral"
+                                   cerrarVentana="@(() => cerrarModal())"></FormularioExperienciaPersonal>
+}
+
+@if (AbrirModalEducacion == true)
+{
+
+    <FormularioEducacion Estilo="@estilo_educacion"
+                         Titulo="@titulo_educacion"
+                         id_educacion="@id_educacion"
+                         id_usuario="@usuario.Id"
+                         CrearOModificar="@GuardarEducacion"
+                         cerrarVentana="@(() => cerrarModalEducacion())"></FormularioEducacion>
+
+
+}
+
+@if (AbrirModalFotoPerfil == true)
+{
+
+    <Tomar_Fotos tenerBase64="@TomarBase64Foto"
+                 Estilo="@estilo_foto_perfil"
+                 Titulo="@titulo_foto_perfil"
+                 cerrarVentana="@(() => cerrarModalFotoPerfil())"></Tomar_Fotos>
+
+
+}
+
+@if (AbrirModalFotoIdentiDelantera == true)
+{
+
+    <Tomar_Fotos tenerBase64="@TomarBase64FotoIdentidadAdelante"
+                 Estilo="@estilo_foto_perfil"
+                 Titulo="@titulo_foto_perfil"
+                 cerrarVentana="@(() => cerrarModalFotoIdentidadAdela())"></Tomar_Fotos>
+
+
+}
+
+@if (AbrirModalFotoIdentiTrasera == true)
+{
+
+    <Tomar_Fotos tenerBase64="@TomarBase64FotoIdentidadTrasera"
+                 Estilo="@estilo_foto_perfil"
+                 Titulo="@titulo_foto_perfil"
+                 cerrarVentana="@(() => cerrarModalFotoIdentidadTrasera())"></Tomar_Fotos>
+
+
+}
+
+@if (preloader == true)
+{
+    <Preloader></Preloader>
+}
+
+@if (ModalErrorImg == true)
+{
+    <MensajeModal Estilo="@estilo_imagen" Titulo="Error en las Fotos" Cuerpo="@mensaje_imagen" cerrarVentana="@(() => cerrarModalImagen())"></MensajeModal>
+}
+
+
+
+@code {
+    //[Parameter] public DatosGeneralesDto datos { get; set; }
+    [Parameter] public EventCallback Atras { get; set; }
+    [Parameter] public string data { get; set; }
+    //[Parameter] public EventCallback<DatoGeneralesFinalDto> MetodoGuardarDatos { get; set; }
+
+    //[Parameter] public EventCallback guardarDatos { get; set; }
+    DatoGeneralesFinalDto datos = new DatoGeneralesFinalDto();
+    private bool AbrirModal = false,
+        ModalErrorImg = false,
+        preloader = false,
+        seDioCerrar = true,
+        errorImagenPerfil = true,
+        errorImagenIdentiAdelantera = true,
+        errorImagenIdentiTrasera = true,
+        AbrirModalFotoPerfil = false,
+        AbrirModalFotoIdentiDelantera = false,
+        AbrirModalFotoIdentiTrasera = false;
+    private string titulo = "Experiencia Laboral", estilo = "",mensaje_imagen="", estilo_imagen="" ;
+
+    UsuarioGeneralDto usuario = new UsuarioGeneralDto();
+    int id_laboratorio = 0;
+    List<Experiencia_Laboral> experiencias_lab = new List<Experiencia_Laboral>();
+    List<Educacion> educacion_listado = new List<Educacion>();
+
+
+    IJSObjectReference module;
+
+    string imageUrlPerfil = null, imageUrlIdentidadDelantera = null, imageUrlIdentidadTrasera = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+
+        try
+        {
+
+            var response_data = await Http.GetAsync($"api/usuarios/tenerUsuario/{data}");
+            response_data.EnsureSuccessStatusCode();
+
+            usuario = await response_data.Content.ReadFromJsonAsync<UsuarioGeneralDto>();
+            datos.RegistroUsuarioId = usuario.Id;
+
+            if (usuario.DatosGeneralesFinal != null)
+            {
+                imageUrlPerfil = usuario.DatosGeneralesFinal.foto_perfil;
+                imageUrlIdentidadDelantera = usuario.DatosGeneralesFinal.foto_identidad_adelantera;
+                imageUrlIdentidadTrasera = usuario.DatosGeneralesFinal.foto_identidad_trasera;
+                StateHasChanged();
+            }
+
+            await tenerExperienciasLaborales();
+            await tenerEducacion();
+
+        }
+        catch (Exception ex)
+        {
+
+            navigationManager.NavigateTo("logout");
+
+
+        }
+    }
+
+    async Task guardarDatos()
+    {
+
+
+
+
+        //si es cero no pasa
+        if (string.IsNullOrEmpty(imageUrlPerfil) != true &&
+           string.IsNullOrEmpty(imageUrlIdentidadDelantera) != true &&
+           string.IsNullOrEmpty(imageUrlIdentidadTrasera) != true)
+        {
+
+
+
+            preloader = true;
+
+            //si se tiene el http y no la base65 enviamos true no se envia data
+            if (imageUrlPerfil.StartsWith("http") == true)
+            {
+                datos.Imagen_perfil.esHttp = true;
+                errorImagenPerfil = true;
+            }
+            else
+            {
+                datos.Imagen_perfil.FileContent = await ConvertirAByte(imageUrlPerfil);
+                datos.Imagen_perfil.tamaño = datos.Imagen_perfil.FileContent.Length;
+                datos.Imagen_perfil.FileName = "png";
+
+                if (datos.Imagen_perfil.tamaño >= 0 && datos.Imagen_perfil.tamaño < 8000000)
+                {
+
+                    errorImagenPerfil = true;
+                }
+                else
+                {
+
+                    errorImagenPerfil = false;
+                }
+            }
+
+            if (imageUrlIdentidadDelantera.StartsWith("http") == true)
+            {
+                datos.Imagen_identidad_delantera.esHttp = true;
+                errorImagenIdentiAdelantera = true;
+            }
+            else
+            {
+                datos.Imagen_identidad_delantera.FileContent = await ConvertirAByte(imageUrlIdentidadDelantera);
+                datos.Imagen_identidad_delantera.tamaño = datos.Imagen_identidad_delantera.FileContent.Length;
+                datos.Imagen_identidad_delantera.FileName = "png";
+
+                if (datos.Imagen_identidad_delantera.tamaño >= 0 && datos.Imagen_identidad_delantera.tamaño < 8000000)
+                {
+
+                    errorImagenIdentiAdelantera = true;
+                }
+                else
+                {
+
+                    errorImagenIdentiAdelantera = false;
+                }
+
+            }
+
+            if (imageUrlIdentidadTrasera.StartsWith("http") == true)
+            {
+                datos.Imagen_identidad_trasera.esHttp = true;
+                errorImagenIdentiTrasera = true;
+            }
+            else
+            {
+                datos.Imagen_identidad_trasera.FileContent = await ConvertirAByte(imageUrlIdentidadTrasera);
+                datos.Imagen_identidad_trasera.tamaño = datos.Imagen_identidad_trasera.FileContent.Length;
+                datos.Imagen_identidad_trasera.FileName = "png";
+
+                if (datos.Imagen_identidad_trasera.tamaño >= 0 && datos.Imagen_identidad_trasera.tamaño < 8000000)
+                {
+
+                    errorImagenIdentiTrasera = true;
+                }
+                else
+                {
+
+                    errorImagenIdentiTrasera = false;
+                }
+
+            }
+
+
+
+
+            if (errorImagenPerfil == false || errorImagenIdentiAdelantera == false || errorImagenIdentiTrasera == false)
+            {
+                mensaje_imagen = "<div class=\"validation-message\">\r\n* La foto debe de pesar menos de 8 MB\r\n</div>";
+                ModalErrorImg = true;
+            }
+            else
+            {
+                //Console.WriteLine(datos.Imagen_perfil.tamaño);
+                //Console.WriteLine(datos.Imagen_identidad_delantera.tamaño);
+                //Console.WriteLine(datos.Imagen_identidad_trasera.tamaño);
+                await ApiGuardarImagenes();
+            }
+
+ 
+        }
+
+
+
+    }
+
+    private async Task ApiGuardarImagenes()
+    {
+        var response = await Http.PostAsJsonAsync("api/usuarios/crearDatosGeneralesFinal", datos);
+        if (response.IsSuccessStatusCode)
+        {
+            Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+            if (respuesta.res == "true")
+            {
+                Console.WriteLine("enserio llego");
+                preloader = false;
+                //salida del if de comparar si es true
+                navigationManager.NavigateTo("configuracion-personal", forceLoad: true);
+            }
+            else
+            {
+                preloader = false;
+            }
+        }
+        else
+        {
+            if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+            {
+                preloader = false;
+                navigationManager.NavigateTo("logout");
+            }
+
+        }
+
+    }
+
+    async Task<byte[]> ConvertirAByte(string data)
+    {
+        // Eliminar el prefijo "data:image/png;base64,"
+        string base64 = data.Substring(data.IndexOf(',') + 1);
+
+        return await Task.Run(() => Convert.FromBase64String(base64));
+    }
+
+
+    //string TenerLaExtension(string data)
+    //{
+    //    return data.Split('/')[1].Split(';')[0];
+    //}
+
+
+    async Task GuardarExperienciaLaboral(Experiencia_Laboral newData)
+    {
+
+
+        //Console.WriteLine(newData.Id);
+        if (seDioCerrar == true)
+        {
+            var response = await Http.PostAsJsonAsync("api/ExperienciaLaboral/guardar/experiencia", newData);
+            if (response.IsSuccessStatusCode)
+            {
+                Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+                if (respuesta.res == "true")
+                {
+
+
+                    //AbrirModal = false;
+                    navigationManager.NavigateTo("configuracion-personal", forceLoad: true);
+                    //await mostrarOverFlow();
+                    //await tenerExperienciasLaborales();
+
+                }
+                else
+                {
+
+                }
+            }
+            else
+            {
+                if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+                {
+                    await mostrarOverFlow();
+                    navigationManager.NavigateTo("logout");
+                }
+
+            }
+        }
+        else
+        {
+            Console.WriteLine("No se guardo");
+            //await mostrarOverFlow();
+        }
+
+
+
+
+    }
+
+    async Task guardarSinExperiencia()
+    {
+        Experiencia_Laboral newData = new Experiencia_Laboral();
+        newData.RegistroUsuarioId = usuario.Id;
+        newData.DepartamentoId = 6;
+        newData.MunicipioId = 76;
+        newData.Salario = 0;
+        newData.Compañia = "Ninguna";
+        newData.Posicion_Laboral = "Sin Experiencia";
+        newData.Descripcion = "Sin Experiencia";
+        newData.Desde = DateTime.Now;
+        newData.Hasta = "Actualidad";
+
+
+        var response = await Http.PostAsJsonAsync("api/ExperienciaLaboral/guardar/experiencia", newData);
+        if (response.IsSuccessStatusCode)
+        {
+            Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+            if (respuesta.res == "true")
+            {
+
+                navigationManager.NavigateTo("configuracion-personal", forceLoad: true);
+                //await tenerExperienciasLaborales();
+
+
+            }
+            else
+            {
+
+            }
+        }
+        else
+        {
+            if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+            {
+
+                navigationManager.NavigateTo("logout");
+            }
+
+        }
+    }
+
+    async Task tenerExperienciasLaborales()
+    {
+        try
+        {
+
+            var response_data = await Http.GetAsync($"api/ExperienciaLaboral/tener/experiencia/{usuario.Id}");
+            response_data.EnsureSuccessStatusCode();
+
+            experiencias_lab = await response_data.Content.ReadFromJsonAsync<List<Experiencia_Laboral>>();
+            //StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            await mostrarOverFlow();
+            navigationManager.NavigateTo("logout");
+
+
+        }
+    }
+
+    async Task EliminarExperiencias(Experiencia_Laboral deleteData)
+    {
+        //Console.WriteLine("esta en datageneralusuarioNext");
+        var response = await Http.PostAsJsonAsync("api/ExperienciaLaboral/eliminar/experiencia", deleteData);
+        if (response.IsSuccessStatusCode)
+        {
+            Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+            if (respuesta.res == "true")
+            {
+                navigationManager.NavigateTo("configuracion-personal", forceLoad: true);
+                //await tenerExperienciasLaborales();
+            }
+            else
+            {
+
+            }
+        }
+        else
+        {
+            if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+            {
+
+                navigationManager.NavigateTo("logout");
+            }
+
+        }
+    }
+
+    async Task ModificarExperienciaLaboral(int id_lab)
+    {
+
+
+        //Console.WriteLine("Toma tu id:"+id_lab);
+        await modal_experiencia_laboral(id_lab);
+        //AbrirModal = true;
+    }
+
+    private async Task modal_experiencia_laboral(int id_lab)
+    {
+        await ocultarOverFlow();
+        id_laboratorio = id_lab;
+        AbrirModal = true;
+        seDioCerrar = false;
+        StateHasChanged();
+
+    }
+
+    private async Task btnCerrarExpeLaboral(bool isClose)
+    {
+        //ocultarOverFlow();
+        await mostrarOverFlow();
+        seDioCerrar = isClose;
+        AbrirModal = false;
+        StateHasChanged();
+    }
+
+
+    private async Task cerrarModal()
+    {
+
+        await mostrarOverFlow();
+        AbrirModal = !AbrirModal;
+        estilo = AbrirModal == true ? "display: none;" : "";
+        StateHasChanged();
+    }
+
+    private async Task mostrarOverFlow()
+    {
+        await module.InvokeVoidAsync("cambiarOverflowActivo");
+    }
+
+    private async Task ocultarOverFlow()
+    {
+
+        await module.InvokeVoidAsync("cambiarOverflow");
+    }
+
+    //------------------------educacion
+
+    private bool AbrirModalEducacion = false;
+    private string titulo_educacion = "Educacion", estilo_educacion = "";
+    private int id_educacion = 0;
+
+    private async Task cerrarModalEducacion()
+    {
+        await mostrarOverFlow();
+        AbrirModalEducacion = !AbrirModalEducacion;
+        estilo_educacion = AbrirModalEducacion == true ? "display: none;" : "";
+    }
+
+    private async Task GuardarEducacion(Educacion newData)
+    {
+
+        var response = await Http.PostAsJsonAsync("api/Educaciones/guardar/educacion", newData);
+        if (response.IsSuccessStatusCode)
+        {
+            Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+            if (respuesta.res == "true")
+            {
+
+                navigationManager.NavigateTo("configuracion-personal", forceLoad: true);
+                //AbrirModalEducacion = false;
+                //await mostrarOverFlow();
+                //await tenerEducacion();
+
+
+            }
+            else
+            {
+
+            }
+        }
+        else
+        {
+            if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+            {
+                await mostrarOverFlow();
+                navigationManager.NavigateTo("logout");
+            }
+
+        }
+    }
+
+
+    private async Task modal_estudios(int id_estudio)
+    {
+        await ocultarOverFlow();
+        id_educacion = id_estudio;
+        AbrirModalEducacion = true;
+
+
+    }
+
+    async Task tenerEducacion()
+    {
+        try
+        {
+
+            var response_data = await Http.GetAsync($"api/Educaciones/tener/educacion/{usuario.Id}");
+            response_data.EnsureSuccessStatusCode();
+
+            educacion_listado = await response_data.Content.ReadFromJsonAsync<List<Educacion>>();
+            //StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            await mostrarOverFlow();
+            navigationManager.NavigateTo("logout");
+
+
+        }
+    }
+
+    async Task ModificarEducacion(int id_educa)
+    {
+
+
+        Console.WriteLine("Toma tu id en educacion:" + id_educa);
+        await modal_estudios(id_educa);
+        //AbrirModal = true;
+    }
+
+    async Task EliminarEducacion(Educacion deleteData)
+    {
+
+        //Console.WriteLine("esta en datageneralusuarioNext");
+
+        var response = await Http.PostAsJsonAsync("api/Educaciones/eliminar/educacion", deleteData);
+        if (response.IsSuccessStatusCode)
+        {
+            Respuesta respuesta = JsonSerializer.Deserialize<Respuesta>(await response.Content.ReadAsStringAsync());
+
+            if (respuesta.res == "true")
+            {
+                navigationManager.NavigateTo("configuracion-personal", forceLoad: true);
+                //await tenerEducacion();
+            }
+            else
+            {
+
+            }
+        }
+        else
+        {
+            if ((int)response.StatusCode >= 400 && (int)response.StatusCode <= 499)
+            {
+
+                navigationManager.NavigateTo("logout");
+            }
+
+        }
+    }
+
+
+
+    //  MODAL FOTO DE PERFIL
+    string estilo_foto_perfil = "", titulo_foto_perfil = "Foto de Perfil";
+
+    private async Task cerrarModalFotoPerfil()
+    {
+        await mostrarOverFlow();
+        await DeneterCamara();
+        AbrirModalFotoPerfil = !AbrirModalFotoPerfil;
+        estilo_foto_perfil = AbrirModalFotoPerfil == true ? "display: none;" : "";
+    }
+
+    private async Task abrirModalFotoPerfil()
+    {
+        titulo_foto_perfil = "Foto de Perfil";
+        await ocultarOverFlow();
+        AbrirModalFotoPerfil = true;
+    }
+
+    private async Task DeneterCamara()
+    {
+        await module.InvokeVoidAsync("detenerCamara");
+
+    }
+
+    private async Task TomarBase64Foto(string base64)
+    {
+
+        imageUrlPerfil = base64;
+
+        await cerrarModalFotoPerfil();
+    }
+
+    private async Task abrirModalFotoIdentidadAdelantera()
+    {
+        titulo_foto_perfil = "Foto de Identidad parte Adelantera";
+        await ocultarOverFlow();
+        AbrirModalFotoIdentiDelantera = true;
+    }
+
+    private async Task TomarBase64FotoIdentidadAdelante(string base64)
+    {
+
+        imageUrlIdentidadDelantera = base64;
+
+        await cerrarModalFotoIdentidadAdela();
+    }
+
+    private async Task cerrarModalFotoIdentidadAdela()
+    {
+        await mostrarOverFlow();
+        await DeneterCamara();
+        AbrirModalFotoIdentiDelantera = !AbrirModalFotoIdentiDelantera;
+        estilo_foto_perfil = AbrirModalFotoIdentiDelantera == true ? "display: none;" : "";
+    }
+
+    private async Task abrirModalFotoIdentidadTrasera()
+    {
+        titulo_foto_perfil = "Foto de Identidad parte Trasera";
+        await ocultarOverFlow();
+        AbrirModalFotoIdentiTrasera = true;
+    }
+
+    private async Task TomarBase64FotoIdentidadTrasera(string base64)
+    {
+        imageUrlIdentidadTrasera = base64;
+
+        await cerrarModalFotoIdentidadTrasera();
+    }
+
+    private async Task cerrarModalFotoIdentidadTrasera()
+    {
+        await mostrarOverFlow();
+        await DeneterCamara();
+        AbrirModalFotoIdentiTrasera = !AbrirModalFotoIdentiTrasera;
+        estilo_foto_perfil = AbrirModalFotoIdentiTrasera == true ? "display: none;" : "";
+    }
+
+
+    //este metodo es para ver el error
+    private void cerrarModalImagen()
+    {
+        ModalErrorImg = !ModalErrorImg;
+        estilo_imagen = ModalErrorImg == true ? "display: none;" : "";
+
+    }
+
+
+}

@@ -1,0 +1,921 @@
+﻿@page "/contrato-personal"
+
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+@* esta 2 lineas para abajo son para entrar solo si estan logiados *@
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization;
+@inject IJSRuntime JSRuntime
+@*inicio_chequeado asi se llama la estructura del contrato*@
+@*inicio_chequeado*@
+
+<br />
+<br />
+<!--Contratox-->
+<div class="container" style="max-width: 1200px !important; min-width: 268px !important;">
+
+    <!------ Include the above in your HEAD tag ---------->
+    <div class="container">
+        <div class="socials no-print">
+            @if (respuesta.contrato_firmado == false)
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <b class="lead">Pasos:</b><br />
+                        <span class="">1- Lee contrato</span><br />
+                        <span class="">2- Presionar el botón de firmar</span><br />
+                        <span class="">3- Presionar el botón de finalizar</span><br />
+                    </div>
+                </div>
+            }
+
+
+            <div class="align_center">
+
+                <div class="container" style="background: white; max-width: 1000px; ">
+                    <div class="row">
+
+                        <div class="col-md-12 col-ms-12 col-lg-12">
+                            <a @onclick="volverAtras"
+                               class="btn btn-light" style="color: #212529; background-color: #e2e6ea; border-color: #dae0e5;">
+                                Atras
+                            </a>
+
+                            @if (respuesta.contrato_firmado == false)
+                            {
+                                <a @onclick="Firmar" class="btn btn-dark" style="margin-left: 10px; color: #fff; background-color: #343a40; border-color: #343a40;">Firmar</a>
+
+                            }
+
+                            @if (respuesta.contrato_firmado == false)
+                            {
+                                @if (estaFirmado == false)
+                                {
+                                    <button style="margin-left: 10px;" class="btn btn-success" disabled>
+                                        Finalizar
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button style="margin-left: 10px;" @onclick="firmarCompleta" class="btn btn-success">
+                                        Finalizar
+                                    </button>
+                                }
+                            }
+
+
+
+
+                            <a style="margin-left: 10px;" href="javascript:"
+                               @onclick="imprimir"
+                               class="btn btn-warning">Descargar</a>
+
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+        <div class="well" id="canvas_div_pdf_dowloand">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row hidden-md hidden-lg">
+                        <h1 class="text-center">
+                            @*Contrato impreso desde Yuju.com*@
+                        </h1>
+                    </div>
+
+                    <div class="pull-left col-md-4 col-xs-12 thumb-contenido">
+                        <img class="center-block img-responsive"
+                             src="images/logo5.png" />
+                    </div>
+
+                    <div class="pull-center col-md-4 col-xs-12 thumb-contenido">
+                        <h1></h1>
+                    </div>
+
+                    <div class="pull-left col-md-4 col-xs-12 thumb-contenido">
+                        <img class="center-block img-responsive"
+                             src="images/gobimg.png" />
+                    </div>
+
+                    <div class="">
+                        <p class="text-justify"></p>
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+
+                              margin: 0in;
+                              text-align: center;
+                           ">
+                            <strong>
+                                <u>
+                                    <span style="
+                                       font-size: 19px;
+                                       line-height: 100%;
+                                       font-family: 'Calibri', sans-serif;
+                                       color: black;
+                                    ">
+                                        CONTRATO DE PRESTACIÓN DE SERVICIOS POR
+                                        GESTIONES ADMINISTRATIVAS
+                                    </span>
+                                </u>
+                            </strong>
+                        </p>
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+
+                              margin: 0in;
+                              text-align: center;
+                           ">
+                            <strong>
+                                <u>
+                                    <span style="
+                                       font-size: 19px;
+                                       line-height: 100%;
+                                       font-family: 'Calibri', sans-serif;
+                                       color: black;
+                                    ">
+                                        ENTRE LA AGENCI<em>A&nbsp;</em>DE EMPLEO
+                                        PRIV<em>A</em>DA Y EL BUSC<em>A</em>DOR DE
+                                        EMPLEO.
+                                    </span>
+                                </u>
+                            </strong>
+                        </p>
+
+                        @*inicio_chequeado*@
+
+                        @myMarkup
+
+                        @*fin_chequeado*@
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+                              line-height: 150%;
+                              margin: 0in;
+                              text-align: justify;
+                           ">
+                            <span style="
+                                 font-family: 'Calibri', sans-serif;
+                                 color: black;
+                              ">&nbsp;</span>
+                        </p>
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+                              line-height: 150%;
+                              margin: 0in;
+                              text-align: justify;
+                           ">
+                            <span style="
+                                 font-family: 'Calibri', sans-serif;
+                                 color: black;
+                              ">&nbsp;</span>
+                        </p>
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+                              line-height: 150%;
+                              margin: 0in;
+                              text-align: justify;
+                           ">
+                            <span style="
+                                 font-family: 'Calibri', sans-serif;
+                                 color: black;
+                              ">&nbsp;</span>
+                        </p>
+
+                        @*<p style="
+                                  margin-right: 0in;
+                                  margin-left: 0in;
+                                  font-size: 15px;
+                                  font-family: 'Calibri', sans-serif;
+                                  margin-top: 0in;
+                                  margin-bottom: 8pt;
+                                  line-height: 150%;
+                                  margin: 0in;
+                                  text-align: justify;
+                               ">
+                                <span style="
+                                     font-family: 'Calibri', sans-serif;
+                                     color: black;
+                                  ">
+                                    <br /><br /><br />
+                                 </span>
+                            </p>*@
+
+                        <div class="container align_center" style="  max-width: 100%; ">
+
+                            <div class="row">
+                                <!--Nombre-->
+                                <div class="col-12 ">
+                                    <p style="
+                                    margin-right: 0in;
+                                    margin-left: 0in;
+                                    font-size: 15px;
+                                    font-family: 'Calibri', sans-serif;
+                                    margin-top: 0in;
+                                    margin-bottom: 8pt;
+                                    line-height: 150%;
+                                    margin: 0in;
+                                    text-align: center;
+
+                                 ">
+                                        <span style="font-family: 'Calibri', sans-serif">
+                                            <span class="textunderline">
+                                                &nbsp; &nbsp; &nbsp;
+                                                <img src="images/firmconsulab-preview.png"
+                                                     style="
+                                             margin-bottom: -2px;
+                                             margin: -80px 10px -80px -5px;
+                                          "
+                                                     alt="firma"
+                                                     width="140px"
+                                                     height="99px" />
+                                            </span><br />
+                                            <span style="
+                                          font-family: 'Calibri', sans-serif;
+                                          color: black;
+                                       ">
+                                                Yuju
+                                            </span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                        </span>
+                                    </p>
+                                </div>
+                                <!--Fin Nombre-->
+                                <br />
+                                <!--Firma-->
+                                <div class="col-12 ">
+                                    <p style="
+                                    margin-right: 0in;
+                                    margin-left: 0in;
+                                    font-size: 15px;
+                                    font-family: 'Calibri', sans-serif;
+                                    margin-top: 0in;
+                                    margin-bottom: 8pt;
+                                    line-height: 150%;
+                                    margin: 0in;
+                                    text-align: center;
+
+                                 ">
+                                        <span style="font-family: 'Calibri', sans-serif">
+                                            <img src="@imgFirmaUsuario"
+                                                 style="
+                                          margin-bottom: -15px;
+
+                                       "
+                                                 alt="firma"
+                                                 width="99px"
+                                                 height="99px" />
+
+                                            <br />
+                                            <span style="color:black">
+                                                _________________________
+                                            </span>
+                                            <br />
+                                            <span style="color:black;
+                                          font-family: 'Calibri', sans-serif;
+                                       ">
+                                                Cliente
+                                            </span>
+                                        </span>
+                                    </p>
+                                </div>
+                                <!--Fin Firma-->
+                            </div>
+
+                        </div>
+
+
+                        <!--Fin RowF-->
+                        <div style="
+                              margin-top: 0in;
+                              margin-right: 0in;
+                              margin-bottom: 8pt;
+                              margin-left: 0in;
+                              line-height: 107%;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              border: none;
+                              border-bottom: solid windowtext 2.25pt;
+                              padding: 0in 0in 1pt 0in;
+                           ">
+                            <p style="
+                                 margin-right: 0in;
+                                 margin-left: 0in;
+                                 font-size: 15px;
+                                 font-family: 'Calibri', sans-serif;
+                                 margin-top: 0in;
+                                 margin-bottom: 8pt;
+                                 line-height: 150%;
+                                 margin: 0in;
+                                 text-align: justify;
+                                 border: none;
+                                 padding: 0in;
+                              ">
+                                <u>
+                                    <span style="
+                                       font-family: 'Calibri', sans-serif;
+                                       color: black;
+                                    ">
+                                        <span style="text-decoration: none">&nbsp;</span>
+                                    </span>
+                                </u>
+                            </p>
+                        </div>
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+                              line-height: 150%;
+                              margin: 0in;
+                              text-align: center;
+                           ">
+                            <strong>
+                                <u>
+                                    <span style="
+                                       font-size: 19px;
+                                       line-height: 150%;
+                                       font-family: 'Calibri', sans-serif;
+                                       color: black;
+                                    ">AUTORIZACION</span>
+                                </u>
+                            </strong>
+                        </p>
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+                              line-height: 150%;
+                              margin: 0in;
+                              text-align: justify;
+                           ">
+                            <span style="
+                                 font-family: 'Calibri', sans-serif;
+                                 color: black;
+                              ">
+                                Yo,
+                                <span class="textunderline">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; asdas
+                                    asasd &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                </span>
+                                mayor de edad, con identidad no.
+                                <span class="textunderline">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    0401111343423 &nbsp;&nbsp;&nbsp;
+                                </span>
+                            </span>
+                            . Por este medio AUTORIZO a la Empresa
+                            <span class="textunderline">
+                                &nbsp;&nbsp;&nbsp; Consulab &nbsp;&nbsp;
+                            </span>
+                            a que me deduzca de mi salario el valor de
+                            Lps.____________ por concepto de mi comisión por
+                            colocación a la Agencia de Empleos&nbsp;
+                            <span style="
+                                 font-family: 'Calibri', sans-serif;
+                                 color: black;
+                              ">
+                                Consultora Laboral (CONSULAB). El Cual deberá ser
+                                deducido en las próximas
+                                <span class="textunderline">&nbsp;&nbsp;dos&nbsp;&nbsp;</span>
+                                quincenas después de mi ingreso a esta
+                                empresa.&nbsp;Para Constancia firmo la presente
+                                AUTORIZACION a los<span class="textunderline">
+                                    &nbsp;&nbsp; 13 &nbsp;&nbsp;
+                                </span>
+                                días del mes de
+                                <span class="textunderline">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Abril
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                </span>
+                                del año<span class="textunderline">
+                                    &nbsp;&nbsp; 2023 &nbsp;&nbsp;&nbsp;&nbsp;
+                                </span>.
+                            </span>
+                        </p>
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+                              line-height: 150%;
+                              margin: 0in;
+                              text-align: justify;
+                           ">
+                            <span style="font-family: 'Calibri', sans-serif">&nbsp;</span>
+                        </p>
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+                              line-height: 150%;
+                              margin: 0in;
+                              text-align: justify;
+                           ">
+                            <span style="font-family: 'Calibri', sans-serif">&nbsp;</span>
+                        </p>
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+                              line-height: 150%;
+                              margin: 0in;
+                              text-align: justify;
+                           ">
+                            <span style="font-family: 'Calibri', sans-serif">&nbsp;</span>
+                        </p>
+                        <br /><br /><br />
+                        <!--RowF style="margin:0px 100px;"-->
+                        <div class="container align_center" style="  max-width: 100%; ">
+
+                            <div class="row">
+                                <!--Nombre-->
+                                <div class="col-12 ">
+                                    <p style="
+                                    margin-right: 0in;
+                                    margin-left: 0in;
+                                    font-size: 15px;
+                                    font-family: 'Calibri', sans-serif;
+                                    margin-top: 0in;
+                                    margin-bottom: 8pt;
+                                    line-height: 150%;
+                                    margin: 0in;
+                                    text-align: center;
+
+                                 ">
+                                        <span style="font-family: 'Calibri', sans-serif">
+                                            <span class="textunderline">
+                                                &nbsp; &nbsp; &nbsp;
+                                                <img src="images/firmconsulab-preview.png"
+                                                     style="
+                                             margin-bottom: -2px;
+                                             margin: -80px 10px -80px -5px;
+                                          "
+                                                     alt="firma"
+                                                     width="140px"
+                                                     height="99px" />
+                                            </span><br />
+                                            <span style="
+                                          font-family: 'Calibri', sans-serif;
+                                          color: black;
+                                       ">
+                                                Yuju
+                                            </span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                        </span>
+                                    </p>
+                                </div>
+                                <!--Fin Nombre-->
+                                <br />
+                                <!--Firma-->
+                                <div class="col-12 ">
+                                    <p style="
+                                    margin-right: 0in;
+                                    margin-left: 0in;
+                                    font-size: 15px;
+                                    font-family: 'Calibri', sans-serif;
+                                    margin-top: 0in;
+                                    margin-bottom: 8pt;
+                                    line-height: 150%;
+                                    margin: 0in;
+                                    text-align: center;
+
+                                 ">
+                                        <span style="font-family: 'Calibri', sans-serif">
+                                            <img src="@imgFirmaUsuario"
+                                                 style="
+                                          margin-bottom: -15px;
+
+                                       "
+                                                 alt="firma"
+                                                 width="99px"
+                                                 height="99px" />
+
+                                            <br />
+                                            <span style="color:black">
+                                                _________________________
+                                            </span>
+                                            <br />
+                                            <span style="color:black;
+                                          font-family: 'Calibri', sans-serif;
+                                       ">
+                                                Cliente
+                                            </span>
+                                        </span>
+                                    </p>
+                                </div>
+                                <!--Fin Firma-->
+                            </div>
+
+                        </div>
+
+                        <!--Fin RowF-->
+                        <!--Fin Contrato-->
+                        <br /><br />
+                        <div style="
+                              margin-top: 0in;
+                              margin-right: 0in;
+                              margin-bottom: 8pt;
+                              margin-left: 0in;
+                              line-height: 107%;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              border: none;
+                              border-bottom: solid windowtext 2.25pt;
+                              padding: 0in 0in 1pt 0in;
+                           ">
+                            <p style="
+                                 margin-right: 0in;
+                                 margin-left: 0in;
+                                 font-size: 15px;
+                                 font-family: 'Calibri', sans-serif;
+                                 margin-top: 0in;
+                                 margin-bottom: 8pt;
+                                 line-height: 150%;
+                                 margin: 0in;
+                                 text-align: justify;
+                                 border: none;
+                                 padding: 0in;
+                              ">
+                                <u>
+                                    <span style="
+                                       font-family: 'Calibri', sans-serif;
+                                       color: black;
+                                    ">
+                                        <span style="text-decoration: none">&nbsp;</span>
+                                    </span>
+                                </u>
+                            </p>
+                        </div>
+
+                        <!--Pagare-->
+                        <br /><br /><br /><br />
+                        <p style="
+                              margin-right: 0in;
+                              margin-left: 0in;
+                              font-size: 15px;
+                              font-family: 'Calibri', sans-serif;
+                              margin-top: 0in;
+                              margin-bottom: 8pt;
+                              line-height: 150%;
+                              margin: 0in;
+                              text-align: center;
+                           ">
+                            <strong>
+                                <u>
+                                    <span style="
+                                       font-size: 19px;
+                                       line-height: 150%;
+                                       font-family: 'Calibri', sans-serif;
+                                       color: black;
+                                    ">PAGARE</span>
+                                </u>
+                            </strong>
+                        </p>
+                        <p style="margin-bottom: 0cm"><br /></p>
+                        <p align="CENTER" style="margin-bottom: 0cm">
+                            <u><strong>LIBRE DE PROTESTO</strong></u>
+                        </p>
+                        <p style="margin-bottom: 0cm"><br /></p>
+                        <p style="margin-bottom: 0cm"><br /></p>
+                        <p align="center" style="margin-bottom: 0cm">
+                            <strong>
+                                Por la cantidad de:
+                                <b class="textunderline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
+                            </strong>
+                        </p>
+                        <p style="margin-bottom: 0cm"><br /></p>
+                        <p style="margin-bottom: 0cm">
+                            Lugar y fecha
+                            <span class="textunderline">
+                                &nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </span>
+                        </p>
+                        <p style="margin-bottom: 0cm"><br /></p>
+                        <p align="JUSTIFY"
+                           style="margin-top: 0.64cm; margin-bottom: 0.28cm">
+                            Yo
+                            <span class="textunderline">
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                asdas asasd
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </span>
+                            PROMETO INCONDICIONALMENTE PAGAR a la empresa
+                            INVERSIONES S Y R la cantidad de
+                            ________________________________________________ , (
+                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                            &nbsp; &nbsp; &nbsp; ) . El plazo del siguiente
+                            PAGARE es de
+                            <b class="textunderline">
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </b>
+                            , contando a partir del dia de HOY, por lo que suma
+                            adeudada deberá pagarse a mas tardar el dia
+                            <b class="textunderline">
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </b>
+                            . El lugar de pago del presente PAGARE será &nbsp;el
+                            Bo. El Centro 2 calle 3 avenida Edificio Mall Pasaje
+                            Valle Tercer Nivel Local 6. &nbsp; El pago de la
+                            cantidad antes mencionada deberá realizarse en la
+                            fecha estipulada sin necesidad de cobro ni
+                            requerimiento alguno por parte del acreedor,
+                            INVERSIONES S. Y R. &nbsp;En caso de incumplimiento
+                            en el pago de la obligación aquí contenida la empresa
+                            INVERSIONES S Y R podrá exigir judicialmente el cobro
+                            íntegro del total del PAGARE mas los gastos en que se
+                            incurriere en el proceso de recuperación del mismo.
+                            &nbsp; <br />Yo
+                            <span class="textunderline">
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; asdas asasd
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </span>
+                            expresamente renuncio fuera de mi domicilio y me
+                            someto a los TRIBUNALES de la ciudad de
+                            ______________________ y
+                            _______________________________________________
+                            señalo para recibir toda clase de notificaciones,
+                            emplazamientos y citaciones la siguiente dirección:
+                            __________________________________________________________________
+                            dado por bien hechas notificaciones, emplazamientos y
+                            citaciones que hicieren en dicho lugar.
+                        </p>
+                        <p style="margin-bottom: 0cm"><br /></p>
+                        <p style="margin-bottom: 0cm"><br /></p>
+                        <p style="margin-bottom: 0cm"><br /></p>
+                        <br /><br />
+                        <p align="CENTER" style="margin-bottom: 0cm">
+                            <span style="font-family: 'Calibri', sans-serif">
+                                <img src="@imgFirmaUsuario"
+                                     style="margin-bottom: -20px; "
+                                     alt="firma"
+                                     width="99px"
+                                     height="99px" />
+
+                                <br />
+                            </span>________________________________________________
+
+                            <!--Fin Firma-->
+
+                            <br />
+                            <br />
+                        </p>
+                        <small style="font-size: 12">
+                            Aprobado por: <b>...</b>
+                        </small>
+
+                        <!--Fin Pagare-->
+                        <p></p>
+                    </div>
+                    <!--fin descdipcion-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="firmconfirm"></div>
+
+
+</div>
+
+@if (AbrirModal == true)
+{
+    <MensajeModal Estilo="@estilo" Titulo="@titulo" Cuerpo="@mensaje" cerrarVentana="@(() => cerrarModal())"></MensajeModal>
+}
+
+@if (preloader == true)
+{
+    <Preloader></Preloader>
+}
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private bool AbrirModal = false, preloader = false;
+    private string titulo = "Contrato de Find Service", mensaje = "", estilo = "";
+    UsuarioGeneralDto respuesta = new UsuarioGeneralDto();
+    string customClaimValue, id_contrato;
+    bool estaFirmado = false, seFirmo = false;
+
+    string imgFirmaUsuario = "images/firmaenblanco.png";
+
+    string nombre = "";
+    MarkupString myMarkup = new MarkupString("");
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationState;
+        var usuario = authState.User;
+
+
+        if (usuario.Identity.IsAuthenticated)
+        {
+
+            customClaimValue = usuario.Claims.FirstOrDefault(c => c.Type == "data")?.Value;
+
+            try
+            {
+
+                var response = await Http.GetAsync($"api/usuarios/tenerUsuario/{customClaimValue}");
+                response.EnsureSuccessStatusCode();
+                //respuesta = await Http.GetFromJsonAsync<RegistroUsuario>($"api/usuarios/tenerUsuario/{customClaimValue}");
+                respuesta = await response.Content.ReadFromJsonAsync<UsuarioGeneralDto>();
+
+                nombre = respuesta.DatosGenerales.Nombre + " " + respuesta.DatosGenerales.Apellido;
+
+                mensaje = $"Hola, {nombre} para poder descargar el contrato debe ser aprobado por el equipo de administracion por lo que su contrato todavia no a sido aprobado.";
+
+                if (respuesta.contrato_firmado == true)
+                {
+                    imgFirmaUsuario = respuesta.firma.Firma;
+                }
+
+                if(respuesta.Contrato==null)
+                {
+                    var response_1 = await Http.GetAsync("api/Contrato/contratos");
+                    response_1.EnsureSuccessStatusCode();
+                    Respuesta contrato = await response_1.Content.ReadFromJsonAsync<Respuesta>();
+
+                    if (contrato.res == "true")
+                    {
+                        id_contrato = contrato.ids;
+                        myMarkup = new MarkupString(contrato.contratos ?? "");
+
+                    }
+                }
+                else
+                {
+                    id_contrato = respuesta.Contrato.Id.ToString();
+                    myMarkup = new MarkupString( respuesta.Contrato.contrato ?? "");
+
+                }
+
+
+
+            }
+            catch (Exception ex)
+            {
+
+                navigationManager.NavigateTo("logout");
+
+            }
+
+
+        }
+        else
+        {
+
+
+        }
+
+    }
+
+    private void Firmar()
+    {
+        estaFirmado = true;
+        imgFirmaUsuario = respuesta.firma.Firma;
+    }
+
+    async Task firmarCompleta()
+    {
+
+        try
+        {
+
+            preloader = true;
+
+            var response_1 = await Http.GetAsync($"api/Contrato/firmarContrato/{customClaimValue}/{id_contrato}");
+            response_1.EnsureSuccessStatusCode();
+            //respuesta = await Http.GetFromJsonAsync<RegistroUsuario>($"api/usuarios/tenerUsuario/{customClaimValue}");
+            Respuesta contratoFirmado = await response_1.Content.ReadFromJsonAsync<Respuesta>();
+
+            if (contratoFirmado.res == "true")
+            {
+                respuesta.id_contrato = int.Parse(id_contrato);
+                respuesta.contrato_firmado = true;
+                preloader = false;
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+            preloader = false;
+            navigationManager.NavigateTo("logout");
+
+        }
+
+
+    }
+
+    private void cerrarModal()
+    {
+
+        AbrirModal = !AbrirModal;
+        estilo = AbrirModal == true ? "display: none;" : "";
+    }
+
+    async Task imprimir()
+    {
+        IJSObjectReference module;
+
+
+        try
+        {
+            preloader = true;
+            var response = await Http.GetAsync($"api/usuarios/tenerUsuario/{customClaimValue}");
+            response.EnsureSuccessStatusCode();
+            //respuesta = await Http.GetFromJsonAsync<RegistroUsuario>($"api/usuarios/tenerUsuario/{customClaimValue}");
+            respuesta = await response.Content.ReadFromJsonAsync<UsuarioGeneralDto>();
+        }
+        catch (Exception)
+        {
+
+            preloader = false;
+            navigationManager.NavigateTo("logout");
+        }
+
+        try
+        {
+            if (respuesta.Contrato_aprobado == false)
+            {
+                preloader = false;
+                //module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+                AbrirModal = true;
+                //await module.InvokeVoidAsync("mostrarAlerta");
+            }
+            else
+            {
+
+                module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Utils.js");
+
+                string nombre_contrato = "Contrato_"+ respuesta.Id + "_" + respuesta.DatosGenerales.Nombre + "_" + respuesta.DatosGenerales.Apellido;
+                await module.InvokeVoidAsync("descargarArchivo", nombre);
+                preloader = false;
+            }
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("error");
+
+        }
+    }
+
+    private void volverAtras()
+    {
+        navigationManager.NavigateTo("configuracion-personal");
+    }
+
+
+}

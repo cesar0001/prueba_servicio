@@ -1,0 +1,80 @@
+﻿ 
+<div class="container">
+    <div class="row">
+        <div class="col-1">
+            <!--<img src="./image/l2/png/featured-job-logo-1.png" alt="">-->
+        </div>
+        <div class="col-11">
+            <h3 class="mb-0" style="margin-bottom: -6px !important ">
+                <b class="titulo">@experiencia_laboral.Posicion_Laboral</b>
+            </h3>
+            <b class="titulo">
+                @experiencia_laboral.Compañia
+            </b><br />
+            <small class="color_negro"> @experiencia_laboral.Desde.ToString("dd-MM-yyyy") - @experiencia_laboral.Hasta </small>
+
+            <br /><small class="color_negro">@experiencia_laboral.Departamento.Nombre - @experiencia_laboral.Estado.Nombre</small>
+            <div class="d-flex align-items-center justify-content-between" style="margin-bottom:24px">
+                <small class="color_negro">
+                    @experiencia_laboral.Descripcion
+                </small>
+                <div>
+                    <a href="javascript:" @onclick="@Modificar" style="font-weight: 600; font-size: 13px; text-decoration: none; background-color: transparent;">Editar</a>
+                    <a class="text-danger"
+                       href="javascript:" @onclick="@Eliminar" style="font-weight: 600; font-size: 13px; text-decoration: none; background-color: transparent;">Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ventanaEliminar == true)
+{
+    <Modal confirmacion="@tomandoData" Mensaje="@mensaje" Titulo="@titulo" Estilo="@estilo" cerrarVentana="@(() => cerrarModal())"></Modal>
+}
+
+
+@code
+{
+    [Parameter] public Experiencia_Laboral experiencia_laboral { get; set; }
+    [Parameter] public EventCallback<Experiencia_Laboral> EliminarExperienciaLab { get; set; }
+    [Parameter] public EventCallback<int> ModificarExperienciaLab { get; set; }
+
+
+    bool ventanaEliminar = false;
+
+    private string titulo = "Experiencia Laboral", estilo = "", mensaje = "";
+
+    private async Task Eliminar()
+    {
+        mensaje = experiencia_laboral.Posicion_Laboral;
+        ventanaEliminar = true;
+        //await EliminarExperienciaLab.InvokeAsync(experiencia_laboral);
+    }
+
+    private async Task Modificar()
+    {
+         await ModificarExperienciaLab.InvokeAsync(experiencia_laboral.Id);
+
+    }
+
+    private async Task tomandoData(bool confirmo)
+    {
+
+        if (confirmo == true)
+        {
+            await EliminarExperienciaLab.InvokeAsync(experiencia_laboral);
+            await cerrarModal();
+            Console.WriteLine("Ventana ListaExperienciaLaboral");
+
+        }
+    }
+
+    private async Task cerrarModal()
+    {
+
+        ventanaEliminar = !ventanaEliminar;
+        estilo = ventanaEliminar == true ? "display: none;" : "";
+    }
+
+}

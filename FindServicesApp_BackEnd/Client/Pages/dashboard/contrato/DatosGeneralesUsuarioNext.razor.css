@@ -1,0 +1,68 @@
+﻿
+.text-danger {
+    color: #f71e3f !important;
+    cursor:pointer;
+}
+
+a.text-danger:hover, a.text-danger:focus {
+    color: #c20723 !important;
+}
+.parrafo_chiquito {
+    display: inline;
+    font-size: 10px;
+    color: #626262;
+}
+
+.agregar {
+    color: #015AAA;
+    text-decoration: none;
+    background-color: transparent;
+    font-weight: 600;
+    font-size: 13px
+}
+
+    .agregar:hover {
+        color: #003564;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+.cambio_color {
+    color: #383838;
+}
+
+select:focus {
+    outline: none;
+}
+
+.valid.modified:not([type=checkbox]) {
+    /*outline: 1px solid #26b050;*/
+    outline: none;
+}
+
+/*.invalid {
+    outline: 1px solid red;*/
+/*border-bottom: 1px solid red;*/
+/*}*/
+
+.validation-message {
+    color: red;
+}
+
+
+.file-input-container {
+    position: relative;
+    max-width: 1500px;
+    height: 40px;
+    border: 1px solid #ccc;
+}
+
+    .file-input-container input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
